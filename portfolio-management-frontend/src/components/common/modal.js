@@ -4,38 +4,31 @@ import {
   ModalOverlay,
   ModalContent,
   ModalHeader,
-  ModalFooter,
-  ModalBody,
   ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Button,
-  Box,
-  Text
-} from "@chakra-ui/react";
+  Text,
+} from '@chakra-ui/react';
 
-// The simplified modal component
 const InvestmentDetailModal = ({ isOpen, onClose, investment }) => {
-  // Return null if no investment data is passed
   if (!investment) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md">
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent bg="white" color="gray.800" borderRadius="lg" shadow="lg">
-        <ModalHeader>Investment Details for {investment.mutualFund}</ModalHeader>
+      <ModalContent>
+        <ModalHeader>Investment Details</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {/* Display investment details */}
-          <Box p={4}>
-            <Text><strong>Quantity:</strong> {investment.qty}</Text>
-            <Text><strong>Invested Amount:</strong> ${investment.investedAmount}</Text>
-            <Text><strong>Current NAV:</strong> ${investment.currentNAV}</Text>
-            <Text><strong>Total Amount:</strong> ${investment.totalAmount}</Text>
-          </Box>
+          <Text><strong>Mutual Fund:</strong> {investment.mutualFund}</Text>
+          <Text><strong>Quantity:</strong> {investment.qty}</Text>
+          <Text><strong>Invested Amount:</strong> {investment.investedAmount}</Text>
+          <Text><strong>Current NAV:</strong> {investment.currentNAV}</Text>
+          <Text><strong>Total Amount:</strong> {investment.totalAmount}</Text>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" onClick={onClose}>
-            Close
-          </Button>
+          <Button colorScheme="blue" mr={3} onClick={onClose}>Close</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
