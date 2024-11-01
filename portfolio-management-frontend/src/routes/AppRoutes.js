@@ -1,20 +1,22 @@
-// src/routes/AppRoutes.js
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import LandingPage from '../components/pages/LandingPage';
-import InvestorPage from '../components/pages/InvestorPage';
-import FundManagerPage from '../components/pages/FundManagerPage';
-import PortalManagerPage from '../components/pages/PortalManagerPage';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import InvestorPage from './components/pages/InvestorPage';
+import FundManagerPage from './components/pages/FundManagerPage';
+import AboutPage from './components/pages/AboutPage'; // Example additional page
+import TermsPage from './components/pages/TermsPage'; // Example additional page
 
-const AppRoutes = () => {
+const App = () => {
     return (
-        <Routes>
-            <Route path="/" exact component={LandingPage} />
-            <Route path="/investor" component={InvestorPage} />
-            <Route path="/fund-manager" component={FundManagerPage} />
-            <Route path="/portal-manager" component={PortalManagerPage} />
-        </Routes>
+        <Router>
+            <Switch>
+                <Route path="/investor" component={InvestorPage} />
+                <Route path="/fund-manager" component={FundManagerPage} />
+                <Route path="/about" component={AboutPage} />
+                <Route path="/terms" component={TermsPage} />
+                {/* Add more routes as needed */}
+            </Switch>
+        </Router>
     );
 };
 
-export default AppRoutes;
+export default App;
