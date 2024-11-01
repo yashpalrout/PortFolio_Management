@@ -1,43 +1,27 @@
 // src/components/pages/LandingPage.js
-import React from 'react';
-import { Box, VStack, Input, Button, Heading, Text } from "@chakra-ui/react";
-import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    FormHelperText,
-    FormErrorIcon,
-  } from "@chakra-ui/form-control"
+import React, { useState } from 'react';
+import { Box, Flex } from "@chakra-ui/react";
+
 import Sidebar from '../layout/Sidebar';
+import Login from './Login';
+import SignupCard from './SignUp'; // Import the SignupCard component
 
 const LandingPage = () => {
+    const [isLogin, setIsLogin] = useState(true); // State to toggle between Login and Signup
+
     return (
-        <Box display="flex" h="100vh">
-            <Sidebar />
-            <Box flex="1" p={10} bg="gray.50" display="flex" justifyContent="center" alignItems="center">
-                <Box bg="white" p={8} rounded="lg" shadow="md" maxW="md" w="full">
-                    <Heading as="h2" size="lg" mb={4} color="gray.700" textAlign="center">
-                        Welcome Back!
-                    </Heading>
-                    <Text mb={6} color="gray.500" textAlign="center">
-                        Please log in to access your account
-                    </Text>
-                    <VStack spacing={4} as="form">
-                        <FormControl id="username" isRequired>
-                            <FormLabel>Username</FormLabel>
-                            <Input type="text" placeholder="Enter your username" />
-                        </FormControl>
-                        <FormControl id="password" isRequired>
-                            <FormLabel>Password</FormLabel>
-                            <Input type="password" placeholder="Enter your password" />
-                        </FormControl>
-                        <Button colorScheme="blue" width="full" mt={4}>
-                            Log In
-                        </Button>
-                    </VStack>
-                </Box>
+        <Flex display="flex" minH={'100vh'}>
+            <Box width="250px" bg="gray.100"> {/* Set width for the sidebar */}
+                <Sidebar />
             </Box>
-        </Box>
+            <Box flex="1" p={4} bg="gray.200" minH={'100vh'}> {/* Allow login/signup to take the remaining space */}
+                {isLogin ? ( // Conditional rendering based on isLogin state
+                    <Login onSignupClick={() => setIsLogin(false)} /> // Pass the function to switch to Signup
+                ) : (
+                    <SignupCard onLoginClick={() => setIsLogin(true)} /> // Pass the function to switch to Login
+                )}
+            </Box>
+        </Flex>
     );
 };
 
