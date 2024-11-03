@@ -45,12 +45,10 @@ public class FundTransactionServiceImpl implements FundTransactionService {
 				.map(t -> t.getType() == TransactionType.BUY ? t.getQuantity() : (-1 * t.getQuantity()))
 				.reduce((a, b) -> a + b);
 
-		System.out.println(optMaxAllowded.isEmpty());
 
 		if (optMaxAllowded.isEmpty()) {
 			throw new TransactionNotAllowdedException();
 		}
-		System.out.println(optMaxAllowded.get());
 
 		int maxAllowded = optMaxAllowded.get();
 
