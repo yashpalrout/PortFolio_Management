@@ -16,9 +16,9 @@ export default async function Layout({
 }>) {
 	const [userDetails] = await Promise.all([UserService.userDetails()]);
 
-	if (!userDetails) {
-		redirect('/auth');
-	}
+	// if (!userDetails) {
+	// 	redirect('/auth');
+	// }
 
 	return (
 		<Suspense fallback={<LoadingPage />}>

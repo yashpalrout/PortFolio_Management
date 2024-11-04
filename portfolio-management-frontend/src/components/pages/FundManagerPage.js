@@ -6,6 +6,7 @@ import { Box, Flex, IconButton, SimpleGrid } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import Sidebar from "../layout/Sidebar";
 import CardView from "../common/CardView"; // Import CardView
+import MyTable from "../layout/MyTable";
 
 const FundManagerPage = () => {
   let { fund_type } = useParams();
@@ -17,7 +18,7 @@ const FundManagerPage = () => {
     links: [
       { label: "Active funds", path: "/FundManagerPage/active" },
       { label: "Create new funds", path: "/new-funds" },
-      { label: "Stocks", path: "/stocks" },
+      { label: "Stocks", path: "/FundManagerPage/stocks" },
       { label: "Closed Funds", path: "/FundManagerPage/closed" },
     ],
     user: {
@@ -36,8 +37,11 @@ const FundManagerPage = () => {
 
   const filterFunds = funds.filter(checkFunction);
   function checkFunction(fund) {
-    return fund.type == fund_type;
+    return fund.type === fund_type;
   }
+
+  let isStockDisplay = fund_type == "stocks" ? true : false;
+  console.log(isStockDisplay);
 
   return (
     // SideBar code
@@ -76,15 +80,23 @@ const FundManagerPage = () => {
         overflowY="auto"
       >
         <Box padding="10px" borderRadius="md" bg="white">
-          <Heading as="h2" size="3xl" noOfLines={1} pl="35%">
-            {fund_type == "active" ? "Active Funds" : "Closed Funds"}
-          </Heading>
-          <br />
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-            {filterFunds.map((fund, index) => (
-              <CardView key={index} fund={fund} />
-            ))}
-          </SimpleGrid>
+          {!isStockDisplay ? (
+            <>
+              <Heading as="h2" size="3xl" noOfLines={1} pl="35%">
+                {fund_type === "active" ? "Active Funds" : "Closed Funds"}
+              </Heading>
+              <br />
+              <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
+                {filterFunds.map((fund, index) => (
+                  <CardView key={index} fund={fund} />
+                ))}
+              </SimpleGrid>
+            </>
+          ) : (
+            <p>
+              <MyTable />
+            </p>
+          )}
         </Box>
       </Box>
     </Flex>
