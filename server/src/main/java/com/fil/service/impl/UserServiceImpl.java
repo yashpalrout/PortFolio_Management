@@ -17,65 +17,63 @@ import com.fil.service.UserService;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-	@Autowired
-	UserRepo userRepo;
+    @Autowired
+    UserRepo userRepo;
 
-	@Autowired
-	TextHasher hasher;
+    @Autowired
+    TextHasher hasher;
 
-	@Override
-	public User login(User data) throws NotFoundException {
-		Optional<User> optUser = userRepo.findByEmail(data.getEmail());
-		System.out.println(optUser.isPresent());
-		if (optUser.isEmpty()) {
-			throw new NotFoundException();
-		}
+    @Override
+    public User login(User data) throws NotFoundException {
+        Optional<User> optUser = userRepo.findByEmail(data.getEmail());
+        if (optUser.isEmpty()) {
+            throw new NotFoundException();
+        }
 
-		boolean passwordMatched = hasher.verifyHash(data.getPassword(), optUser.get().getPassword());
-		System.out.println(passwordMatched);
-		if (!passwordMatched) {
-			throw new NotFoundException();
-		}
-		return optUser.get();
-	}
+        boolean passwordMatched = hasher.verifyHash(data.getPassword(), optUser.get().getPassword());
+        if (!passwordMatched) {
+            throw new NotFoundException();
+        }
+        return optUser.get();
+    }
 
-	@Override
-	public User register(User data) throws AlreadyExistsException {
-		Optional<User> optUser = userRepo.findByEmail(data.getEmail());
-		if (optUser.isPresent()) {
-			throw new AlreadyExistsException();
-		}
-		userRepo.save(data);
-		return data;
+    @Override
+    public User register(User data) throws AlreadyExistsException {
+        Optional<User> optUser = userRepo.findByEmail(data.getEmail());
+        if (optUser.isPresent()) {
+            throw new AlreadyExistsException();
+        }
+        userRepo.save(data);
+        return data;
 
-	}
+    }
 
-	@Override
-	public User findUserById(int user_id) throws NotFoundException {
-		return userRepo.findById(user_id).orElseThrow(() -> new NotFoundException());
-	}
+    @Override
+    public User findUserById(int user_id) throws NotFoundException {
+        return userRepo.findById(user_id).orElseThrow(() -> new NotFoundException());
+    }
 
-	@Override
-	public void removeUser(User toBeRemoved) throws NotFoundException {
-		Optional<User> optUser = userRepo.findById(toBeRemoved.getUserId());
+    @Override
+    public void removeUser(User toBeRemoved) throws NotFoundException {
+        Optional<User> optUser = userRepo.findById(toBeRemoved.getUserId());
 
-		if (optUser.isEmpty()) {
-			throw new NotFoundException();
-		}
+        if (optUser.isEmpty()) {
+            throw new NotFoundException();
+        }
 
-		userRepo.delete(toBeRemoved);
-	}
+        userRepo.delete(toBeRemoved);
+    }
 
-	@Override
-	public User updateUser(User user) throws NotFoundException {
+    @Override
+    public User updateUser(User user) throws NotFoundException {
 
-		Optional<User> optUser = userRepo.findById(user.getUserId());
+        Optional<User> optUser = userRepo.findById(user.getUserId());
 
-		if (optUser.isEmpty()) {
-			throw new NotFoundException();
-		}
-		userRepo.save(user);
-		return user;
-	}
+        if (optUser.isEmpty()) {
+            throw new NotFoundException();
+        }
+        userRepo.save(user);
+        return user;
+    }
 
 }
