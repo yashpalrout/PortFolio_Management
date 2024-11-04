@@ -37,5 +37,14 @@ public class ResponseUtil {
         return headers;
     }
 
+    public static HttpHeaders clearCookies() {
+        ResponseCookie authCookie = ResponseUtil.createAuthCookie(Const.AUTH_COOKIE, null, 1);
+        ResponseCookie refreshCookie = ResponseUtil.createAuthCookie(Const.REFRESH_COOKIE, null, 1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.addAll(HttpHeaders.SET_COOKIE, List.of(authCookie.toString(), refreshCookie.toString()));
+        return headers;
+    }
+
 
 }
