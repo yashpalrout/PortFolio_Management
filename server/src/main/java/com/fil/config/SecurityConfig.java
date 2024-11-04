@@ -20,7 +20,7 @@ import static com.fil.util.Const.REFRESH_COOKIE;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserAuthenticationEntryPoint userAuthenticationEntryPoint;
-    
+
     @Autowired
     private SessionService sessionService;
 
@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(new UsernamePasswordAuthFilter(), BasicAuthenticationFilter.class)
                 .addFilterBefore(new AuthCookieAuthenticationFilter(), UsernamePasswordAuthFilter.class)
-                .csrf().disable()
+                .cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().logout().deleteCookies(AUTH_COOKIE, REFRESH_COOKIE)
                 .and()

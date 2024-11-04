@@ -15,6 +15,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.fil.util.Const.AUTH_COOKIE;
@@ -43,7 +44,6 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
                 // authentication by cookie
                 String tokenType = (String) authentication.getPrincipal();
                 String token = (String) authentication.getCredentials();
-
                 if (tokenType.equals(AUTH_COOKIE)) {
                     Optional<String> decoded = JwtUtil.decode(token);
                     if (decoded.isPresent()) {
@@ -54,14 +54,13 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
                     session = sessionService.findByRefreshToken(token);
                     user = session.getUser();
                 }
-
             }
 
             if (user == null) {
                 throw new NotFoundException();
             }
 
-            return new UsernamePasswordAuthenticationToken(user, session.getAccessToken());
+            return new UsernamePasswordAuthenticationToken(user, null, List.of());
         } catch (Exception e) {
             return null;
         }

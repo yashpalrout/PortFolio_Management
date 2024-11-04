@@ -48,9 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<?> details(HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
-
+    public ResponseEntity<?> details(@AuthenticationPrincipal User user, HttpServletRequest req) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("user", user);
