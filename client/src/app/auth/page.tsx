@@ -14,9 +14,7 @@ export default async function Page({
 	const userDetails = await UserService.userDetails();
 
 	if (userDetails) {
-		redirect(searchParams.callback || '/console');
-	} else {
-		console.log('AUTH PAGE');
+		redirect(searchParams.callback || '/console/dashboard');
 	}
 
 	return (

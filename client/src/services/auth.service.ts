@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import api from '@/lib/api';
-import { SERVER_URL } from '@/lib/consts';
 import { IUser } from '@/types/user';
-import { registerSchema } from '@/validators/auth.validator';
+import { passwordSchema, registerSchema, userDetailsSchema } from '@/validators/auth.validator';
 import axios from 'axios';
 import { z } from 'zod';
 
 export default class AuthService {
 	static async isAuthenticated() {
 		try {
-			await api.get('/auth/validate', {
+			const { data } = await api.get('/auth/validate', {
 				headers: {
 					'Cache-Control': 'no-cache',
 					Pragma: 'no-cache',
@@ -25,8 +24,6 @@ export default class AuthService {
 
 	static async login(email: string, password: string) {
 		try {
-			console.log(SERVER_URL);
-
 			const { data } = await api.post(`/auth/login`, {
 				email,
 				password,
@@ -37,8 +34,6 @@ export default class AuthService {
 				error: null,
 			};
 		} catch (err: unknown) {
-			console.log(err.response);
-
 			return {
 				authenticated: false,
 				user: null,
@@ -87,4 +82,5 @@ export default class AuthService {
 			};
 		}
 	}
+
 }

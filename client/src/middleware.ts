@@ -7,18 +7,16 @@ import UserService from './services/user.service';
 
 export async function middleware(request: NextRequest) {
 	const isAuthenticated = await UserService.userDetails();
-	console.log('isAuthenticated', isAuthenticated);
 
 	const pathname = request.nextUrl.pathname;
 	const roleBasedPath = '/console';
 
-	console.log('pathname', pathname);
-	console.log('cookies', request.cookies);
-
 	if (pathname.startsWith('/auth')) {
 		if (isAuthenticated) {
 			const callback = request.nextUrl.searchParams.get('callback');
-			return Response.redirect(new URL(callback || `${roleBasedPath}/console`, request.url));
+			return Response.redirect(
+				new URL(callback || `${roleBasedPath}/console/dashboard/dashboard`, request.url)
+			);
 		} else {
 			return;
 		}
