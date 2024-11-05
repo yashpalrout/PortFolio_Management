@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -80,6 +81,11 @@ public class UserServiceImpl implements UserService {
         System.out.println(oldPassword);
         System.out.println(hasher.verifyHash(oldPassword, user.getPassword()));
         return hasher.verifyHash(oldPassword, user.getPassword());
+    }
+
+    @Override
+    public List<User> listAllUsers() {
+        return userRepo.findAll();
     }
 
 }

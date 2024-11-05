@@ -21,9 +21,9 @@ export default async function Layout({
 		UserService.walletBalance(),
 	]);
 
-	// if (!userDetails) {
-	// 	redirect('/auth');
-	// }
+	if (!userDetails) {
+		redirect('/auth');
+	}
 
 	return (
 		<Suspense fallback={<LoadingPage />}>
@@ -31,7 +31,7 @@ export default async function Layout({
 				<UserProvider data={userDetails!}>
 					<SidebarProvider>
 						<AppSidebar user={userDetails} wallet_balance={wallet_balance} />
-						<div>
+						<div className='w-full'>
 							<SidebarTrigger />
 							{children}
 						</div>

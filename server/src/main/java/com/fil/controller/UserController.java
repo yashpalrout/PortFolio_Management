@@ -106,10 +106,9 @@ public class UserController {
     }
 
     @PostMapping("/add-user")
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserRegistrationData data, HttpServletRequest req)
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserRegistrationData data, @AuthenticationPrincipal User authUser)
             throws AlreadyExistsException, PermissionDeniedException {
-        User reqUser = (User) req.getAttribute("user");
-        if (reqUser.getRole() != UserRole.PORTAL_MANAGER) {
+        if (authUser.getRole() != UserRole.PORTAL_MANAGER) {
             throw new PermissionDeniedException();
         }
 
@@ -122,6 +121,19 @@ public class UserController {
         response.put("message", "User saved succesfully");
         response.put("data", user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> allUsers(@AuthenticationPrincipal User user)
+            throws AlreadyExistsException, PermissionDeniedException {
+        if (user.getRole() != UserRole.PORTAL_MANAGER) {
+            throw new PermissionDeniedException();
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", userService.listAllUsers());
+        return ResponseEntity.ok(response);
 
     }
 

@@ -4,6 +4,8 @@ import com.fil.exceptions.AlreadyExistsException;
 import com.fil.exceptions.NotFoundException;
 import com.fil.model.User;
 
+import java.util.List;
+
 public interface UserService {
 
     public User login(User user) throws NotFoundException;
@@ -17,5 +19,7 @@ public interface UserService {
     public void updateUser(User user) throws NotFoundException;
 
     public boolean verifyPassword(User user, String oldPassword);
+
+    public List<User> listAllUsers();
 
 }

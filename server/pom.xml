@@ -128,14 +128,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!--                    <docker>-->
-                    <!--                        <host>unix:///Users/sanskar/.docker/run/docker.sock</host>-->
-                    <!--                    </docker>-->
-                    <image>
-                        <name>investment-0.0.1</name>
-                    </image>
-                </configuration>
             </plugin>
 
         </plugins>
