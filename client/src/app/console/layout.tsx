@@ -21,9 +21,9 @@ export default async function Layout({
 		UserService.walletBalance(),
 	]);
 
-	if (!userDetails) {
-		redirect('/auth');
-	}
+	// if (!userDetails) {
+	// 	redirect('/auth');
+	// }
 
 	return (
 		<Suspense fallback={<LoadingPage />}>

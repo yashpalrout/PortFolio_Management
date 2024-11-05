@@ -1,6 +1,15 @@
 import React from "react";
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+} from "@chakra-ui/react";
 
-function Table() {
+function MyTable() {
   const dummyData = [
     { name: "tata", current: 440, change: 1.2, high: 450, low: 420 },
     { name: "tata", current: 440, change: 1.2, high: 450, low: 420 },
@@ -8,7 +17,7 @@ function Table() {
     { name: "tata", current: 440, change: 1.2, high: 450, low: 420 },
   ];
   return (
-    <TableContainer maxWidth="80%">
+    <TableContainer maxWidth="80%" pl={"20%"}>
       <Table variant="striped" colorScheme="teal">
         <Thead>
           <Tr>
@@ -23,7 +32,7 @@ function Table() {
           {dummyData.map((stocks, index) => (
             <Tr key={index}>
               <Td>{stocks.name}</Td>
-              <Td>{stocks.current}</Td>
+              <Td color={"red"}>{stocks.current}</Td>
               <Td>{stocks.change}</Td>
               <Td>{stocks.high}</Td>
               <Td>{stocks.low}</Td>
@@ -42,4 +51,4 @@ function Table() {
   );
 }
 
-export default Table;
+export default MyTable;

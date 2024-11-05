@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +36,11 @@ public class AuthController {
     @Autowired
     private SessionService sessionService;
 
+    @GetMapping("/check")
+    public void check()   {
+
+    }
+    
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegistrationData data) throws AlreadyExistsException {
         User user = userService.register(data.toUser());
