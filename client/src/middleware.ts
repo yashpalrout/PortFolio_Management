@@ -22,11 +22,11 @@ export async function middleware(request: NextRequest) {
 		}
 	}
 
-	// if (pathname.startsWith(roleBasedPath)) {
-	// 	if (!isAuthenticated) {
-	// 		return Response.redirect(new URL(`/auth?callback=${pathname}`, request.url));
-	// 	}
-	// }
+	if (pathname.startsWith(roleBasedPath)) {
+		if (!isAuthenticated) {
+			return Response.redirect(new URL(`/auth?callback=${pathname}`, request.url));
+		}
+	}
 }
 
 export const config = {

@@ -89,4 +89,13 @@ export default class UserService {
 			throw new Error('Unable to update user details');
 		}
 	}
+
+	static async allUsers() {
+		try {
+			const { data } = await api.get(`/user/all`);
+			return data.data as IUser[];
+		} catch (err) {
+			return null;
+		}
+	}
 }

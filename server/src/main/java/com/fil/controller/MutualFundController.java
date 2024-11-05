@@ -2,8 +2,10 @@ package com.fil.controller;
 
 import com.fil.dto.CreateFundHolding;
 import com.fil.dto.CreateMutualFund;
+import com.fil.dto.Pagination;
 import com.fil.dto.UpdateFundStatus;
 import com.fil.exceptions.InitialisationFailedException;
+import com.fil.interfaces.PaginationParams;
 import com.fil.model.*;
 import com.fil.model.enums.FundStatus;
 import com.fil.model.enums.TransactionType;
@@ -15,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -48,10 +49,10 @@ public class MutualFundController {
     private TickerService tickerService;
 
     @PostMapping()
-    public ResponseEntity<?> create(@Valid @RequestBody CreateMutualFund data, HttpServletRequest req) {
+    public ResponseEntity<?> create(@AuthenticationPrincipal User user, @Valid @RequestBody CreateMutualFund data) {
 
         MutualFund result = mutualFundService.save(data.toMutualFund());
-        fundManagerService.save((User) req.getAttribute("user"), result);
+        fundManagerService.save(user, result);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
@@ -120,8 +121,7 @@ public class MutualFundController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> listFunds(@RequestParam(name = "name", required = false) Optional<String> name,
-                                       HttpServletRequest req) {
+    public ResponseEntity<?> listFunds(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
         List<MutualFund> result;
         if (name.isEmpty() || name.get().isEmpty()) {
             result = mutualFundService.findAll();
@@ -129,13 +129,18 @@ public class MutualFundController {
             result = mutualFundService.search(name.get());
         }
 
-        if (((User) req.getAttribute("user")).getRole() == UserRole.INVESTOR) {
+        if (user.getRole() == UserRole.INVESTOR) {
             result = result.stream().filter(mf -> mf.getStatus() != FundStatus.NOT_LISTED).toList();
         }
+
+        int total = result.size();
+
+        result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, total));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
@@ -196,9 +201,7 @@ public class MutualFundController {
     }
 
     @GetMapping("/transaction-history")
-    public ResponseEntity<?> transactionHistory(HttpServletRequest req) {
-        User user = (User) req.getAttribute("user");
-
+    public ResponseEntity<?> transactionHistory(@AuthenticationPrincipal User user) {
         List<FundTransaction> transactionHistory = fundTrasactionService.transactionHistory(user);
 
         Map<MutualFund, Integer> mfMap = new HashMap<MutualFund, Integer>();
