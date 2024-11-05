@@ -1,8 +1,11 @@
 package com.fil.controller;
 
+import com.fil.dto.PasswordChangeData;
 import com.fil.dto.UserRegistrationData;
+import com.fil.dto.UserUpdateData;
 import com.fil.exceptions.AlreadyExistsException;
 import com.fil.exceptions.InvalidFieldException;
+import com.fil.exceptions.NotFoundException;
 import com.fil.exceptions.PermissionDeniedException;
 import com.fil.model.User;
 import com.fil.model.Wallet;
@@ -48,7 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<?> details(@AuthenticationPrincipal User user, HttpServletRequest req) {
+    public ResponseEntity<?> details(@AuthenticationPrincipal User user) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("user", user);
@@ -56,8 +59,43 @@ public class UserController {
 
     }
 
+
+    @PutMapping("/details")
+    public ResponseEntity<?> updateDetails(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateData data) throws NotFoundException {
+        user.setName(data.getName());
+        user.setPhone(data.getPhone());
+        user.setDob(data.getDob());
+
+        userService.updateUser(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", user);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    @PatchMapping("/details")
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal User user, @Valid @RequestBody PasswordChangeData data) throws NotFoundException {
+        if (!userService.verifyPassword(user, data.getOld_password())) {
+            throw new PermissionDeniedException();
+        }
+
+        user.setPassword(data.getNew_password());
+        userService.updateUser(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("data", user);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
     @GetMapping("/wallet-balance")
-    public ResponseEntity<?> walletBalance(@AuthenticationPrincipal User user, @RequestBody ModelMap modal) {
+    public ResponseEntity<?> walletBalance(@AuthenticationPrincipal User user) {
         Wallet wallet = walletService.findByUser(user);
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -86,5 +124,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
+
 
 }

@@ -39,7 +39,7 @@ export default function Login() {
 			if (searchParams.get('callback')) {
 				router.push(searchParams.get('callback') ?? '/');
 			} else {
-				router.push('/console');
+				router.push('/console/dashboard');
 			}
 		} else {
 			form.setError('email', { message: result.error ?? '' });

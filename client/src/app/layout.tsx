@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@/components/context/ThemeProvider';
 import localFont from 'next/font/local';
 import './globals.css';
+import { Toaster } from '@/components/ui/toaster';
 
 const geistSans = localFont({
 	src: './fonts/GeistVF.woff',
@@ -26,8 +27,9 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<ThemeProvider attribute='class' defaultTheme='dark' enableSystem disableTransitionOnChange>
+				<ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
 					{children}
+					<Toaster />
 				</ThemeProvider>
 			</body>
 		</html>

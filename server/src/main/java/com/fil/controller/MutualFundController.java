@@ -12,6 +12,7 @@ import com.fil.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +34,9 @@ public class MutualFundController {
 
     @Autowired
     private FundManagerService fundManagerService;
+
+    @Autowired
+    private FavoriteFundService favoriteFundService;
 
     @Autowired
     private FundTransactionService fundTrasactionService;
@@ -153,6 +157,44 @@ public class MutualFundController {
 
     }
 
+    @PostMapping("/{fundId}/add-to-favorite")
+    public ResponseEntity<?> addToFavorite(@PathVariable int fundId, @AuthenticationPrincipal User user) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        FavoriteFund favoriteFund = new FavoriteFund(fund, user);
+
+        favoriteFundService.save(favoriteFund);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        return ResponseEntity.ok(map);
+
+    }
+
+    @PostMapping("/{fundId}/remove-from-favorite")
+    public ResponseEntity<?> removeToFavorite(@PathVariable int fundId, @AuthenticationPrincipal User user) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        FavoriteFund favoriteFund = favoriteFundService.findByUserAndMutualFund(user, fund);
+
+        favoriteFundService.remove(favoriteFund);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        return ResponseEntity.ok(map);
+
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<?> favorites(@AuthenticationPrincipal User user) {
+
+        List<FavoriteFund> favoriteFunds = favoriteFundService.findByUser(user);
+        List<MutualFund> mutualFunds = favoriteFunds.stream().map(FavoriteFund::getMutualFund).toList();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", mutualFunds);
+        return ResponseEntity.ok(map);
+    }
+
     @GetMapping("/transaction-history")
     public ResponseEntity<?> transactionHistory(HttpServletRequest req) {
         User user = (User) req.getAttribute("user");
@@ -177,7 +219,7 @@ public class MutualFundController {
         map.put("success", true);
         map.put("outstanding", total);
         map.put("data", transactionHistory);
-        return ResponseEntity.status(HttpStatus.OK).body(map);
+        return ResponseEntity.ok(map);
 
     }
 

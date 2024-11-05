@@ -1,18 +1,16 @@
 package com.fil.service.impl;
 
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fil.exceptions.AlreadyExistsException;
 import com.fil.exceptions.NotFoundException;
 import com.fil.interfaces.TextHasher;
 import com.fil.model.User;
 import com.fil.repo.UserRepo;
 import com.fil.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -65,7 +63,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) throws NotFoundException {
+    public void updateUser(User user) throws NotFoundException {
+        System.out.println(user);
 
         Optional<User> optUser = userRepo.findById(user.getUserId());
 
@@ -73,7 +72,14 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException();
         }
         userRepo.save(user);
-        return user;
+    }
+
+    @Override
+    public boolean verifyPassword(User user, String oldPassword) {
+        System.out.println(user.getPassword());
+        System.out.println(oldPassword);
+        System.out.println(hasher.verifyHash(oldPassword, user.getPassword()));
+        return hasher.verifyHash(oldPassword, user.getPassword());
     }
 
 }

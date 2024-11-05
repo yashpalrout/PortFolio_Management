@@ -3,6 +3,7 @@
 import AuthService from '@/services/auth.service';
 import UserService from '@/services/user.service';
 import { loginSchema, registerSchema } from '@/validators/auth.validator';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 export async function register(details: z.infer<typeof registerSchema>) {
@@ -29,6 +30,7 @@ export async function logout() {
 	const res = await AuthService.logout();
 
 	if (res) {
+		revalidatePath('/');
 		return [true, null] as [true, null];
 	} else {
 		return [false, 'Failed to logout...'] as [false, string];

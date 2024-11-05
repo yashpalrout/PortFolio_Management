@@ -13,16 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static com.fil.util.Const.REFRESH_COOKIE;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -75,14 +76,20 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal User user) {
-//        sessionService.removeSession(user);
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> logout(@AuthenticationPrincipal User user, HttpServletRequest request) {
+        Optional<Cookie> refreshAuth = Stream.of(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
+                .filter(cookie -> REFRESH_COOKIE.equals(cookie.getName()))
+                .findFirst();
+        if (refreshAuth.isPresent()) {
+            Session session = sessionService.findByRefreshToken(refreshAuth.get().getValue());
+            sessionService.removeSession(session);
+        }
 
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().headers(ResponseUtil.clearCookies()).build();
     }
 
-    @PostMapping("/validate")
+    @GetMapping("/validate")
     public ResponseEntity<?> validate(@AuthenticationPrincipal User user) {
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);

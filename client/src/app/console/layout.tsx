@@ -1,4 +1,6 @@
 import { UserProvider } from '@/components/context/user-details';
+import { AppSidebar } from '@/components/elements/AppSidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import UserService from '@/services/user.service';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -14,7 +16,10 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [userDetails] = await Promise.all([UserService.userDetails()]);
+	const [userDetails, wallet_balance] = await Promise.all([
+		UserService.userDetails(),
+		UserService.walletBalance(),
+	]);
 
 	// if (!userDetails) {
 	// 	redirect('/auth');
@@ -23,7 +28,15 @@ export default async function Layout({
 	return (
 		<Suspense fallback={<LoadingPage />}>
 			<main className='w-full h-full '>
-				<UserProvider data={userDetails!}>{children}</UserProvider>
+				<UserProvider data={userDetails!}>
+					<SidebarProvider>
+						<AppSidebar user={userDetails} wallet_balance={wallet_balance} />
+						<div>
+							<SidebarTrigger />
+							{children}
+						</div>
+					</SidebarProvider>
+				</UserProvider>
 			</main>
 		</Suspense>
 	);
