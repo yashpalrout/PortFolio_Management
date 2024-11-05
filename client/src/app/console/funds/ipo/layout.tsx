@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-	title: 'Stocks • Investment Portfolio',
+	title: 'IPOs • Investment Portfolio',
 };
 
 export default async function Layout({

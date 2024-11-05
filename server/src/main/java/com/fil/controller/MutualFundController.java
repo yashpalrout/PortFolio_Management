@@ -130,17 +130,67 @@ public class MutualFundController {
         }
 
         if (user.getRole() == UserRole.INVESTOR) {
-            result = result.stream().filter(mf -> mf.getStatus() != FundStatus.NOT_LISTED).toList();
+            result = result.stream().filter(mf -> mf.getStatus() == FundStatus.LISTED).toList();
         }
-
-        int total = result.size();
 
         result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
-        map.put("pagination", Pagination.paginationMap(pagination, total));
+        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/list-invested")
+    public ResponseEntity<?> listInvested(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
+        List<MutualFund> result = fundTrasactionService.transactionHistory(user).stream().map(FundTransaction::getFund).toList();
+
+        result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/favorite")
+    public ResponseEntity<?> listFavourite(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
+        List<MutualFund> result = favoriteFundService.findByUser(user).stream().map(FavoriteFund::getMutualFund).toList();
+
+        result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/ipo")
+    public ResponseEntity<?> listIPOs(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
+
+        List<MutualFund> result;
+        if (name.isEmpty() || name.get().isEmpty()) {
+            result = mutualFundService.findAll();
+        } else {
+            result = mutualFundService.search(name.get());
+        }
+
+        result = result.stream().filter(mf -> mf.getStatus() == FundStatus.IPO).skip(pagination.getSkip()).limit(pagination.getSize()).toList();
+        
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
 

@@ -12,7 +12,7 @@ import { IUser } from '@/types/user';
 export default async function UserList({ users }: { users: IUser[] }) {
 	return (
 		<div className=''>
-			<Table className='w-full'>
+			<Table className='w-full border border-dashed rounded-md'>
 				<TableCaption>List of all users</TableCaption>
 				<TableHeader>
 					<TableRow>
