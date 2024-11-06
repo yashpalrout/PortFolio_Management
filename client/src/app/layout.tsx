@@ -27,19 +27,6 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<style>
-				{`
-            html, body {
-              margin: 0;
-              padding: 0;
-              height: 100%;
-            }
-            #container {
-              width: 100%;
-              height: 100%;
-            }
-          `}
-			</style>
 			{/* Load the AnyChart libraries using next/script */}
 			<Script
 				src='https://cdn.anychart.com/releases/8.11.1/js/anychart-core.min.js'

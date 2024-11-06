@@ -21,7 +21,6 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
-			console.error(e.response);
 			return null;
 		}
 	}
@@ -41,7 +40,6 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
-			console.error(e.response);
 			return null;
 		}
 	}
@@ -61,7 +59,6 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
-			console.error(e.response);
 			return null;
 		}
 	}
@@ -81,7 +78,6 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
-			console.error(e.response);
 			return null;
 		}
 	}

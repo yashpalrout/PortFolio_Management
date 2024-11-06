@@ -185,14 +185,14 @@ public class MutualFundController {
         }
 
         result = result.stream().filter(mf -> mf.getStatus() == FundStatus.IPO).skip(pagination.getSkip()).limit(pagination.getSize()).toList();
-        
+
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
         map.put("pagination", Pagination.paginationMap(pagination, result.size()));
 
-        return ResponseEntity.status(HttpStatus.OK).body(map);
+        return ResponseEntity.ok(map);
 
     }
 

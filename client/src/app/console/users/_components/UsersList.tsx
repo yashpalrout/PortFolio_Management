@@ -11,8 +11,8 @@ import { IUser } from '@/types/user';
 
 export default async function UserList({ users }: { users: IUser[] }) {
 	return (
-		<div className=''>
-			<Table className='w-full border border-dashed rounded-md'>
+		<div className='border border-dashed rounded-md'>
+			<Table className='w-full '>
 				<TableCaption>List of all users</TableCaption>
 				<TableHeader>
 					<TableRow>
