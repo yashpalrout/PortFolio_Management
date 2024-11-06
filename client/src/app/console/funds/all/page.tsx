@@ -1,3 +1,4 @@
+import CreateMutualFund from '@/components/elements/dialogs/CreateMutualFund';
 import FundService from '@/services/fund.service';
 import { notFound } from 'next/navigation';
 import { DataTable } from '../_components/data-table';
@@ -19,6 +20,9 @@ export default async function Page({
 
 	return (
 		<>
+			<div className='flex justify-end -mt-8 mx-6'>
+				<CreateMutualFund />
+			</div>
 			<DataTable title={'Mutual Funds'} records={data.data} maxRecord={data.pagination.total} />
 		</>
 	);

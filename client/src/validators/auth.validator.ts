@@ -73,3 +73,11 @@ export const passwordSchema = z.object({
 		})
 		.min(8, 'Password must be at least 8 characters'),
 });
+
+export const addMoneySchema = z.object({
+	amount: z
+		.string({
+			message: 'Amount is required',
+		})
+		.refine((amt) => parseFloat(amt) > 0, 'Amount must be greater than 0'),
+});

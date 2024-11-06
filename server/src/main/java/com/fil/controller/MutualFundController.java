@@ -5,6 +5,7 @@ import com.fil.dto.CreateMutualFund;
 import com.fil.dto.Pagination;
 import com.fil.dto.UpdateFundStatus;
 import com.fil.exceptions.InitialisationFailedException;
+import com.fil.exceptions.NotFoundException;
 import com.fil.interfaces.PaginationParams;
 import com.fil.model.*;
 import com.fil.model.enums.FundStatus;
@@ -234,6 +235,24 @@ public class MutualFundController {
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
+        return ResponseEntity.ok(map);
+
+    }
+
+    @GetMapping("/{fundId}/is-favorite")
+    public ResponseEntity<?> isFavorite(@PathVariable int fundId, @AuthenticationPrincipal User user) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        boolean isFavorite = false;
+        try {
+            favoriteFundService.findByUserAndMutualFund(user, fund);
+            isFavorite = true;
+        } catch (NotFoundException ignored) {
+        }
+
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("isFavorite", isFavorite);
         return ResponseEntity.ok(map);
 
     }

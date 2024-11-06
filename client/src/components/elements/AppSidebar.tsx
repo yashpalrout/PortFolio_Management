@@ -36,6 +36,7 @@ import {
 	DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import ThemeSwitch from './ThemeSwitch';
+import { AddMoney } from './dialogs/AddMoney';
 import { ChangePassword } from './dialogs/ChangePassword';
 import { EditProfile } from './dialogs/EditProfile';
 
@@ -124,7 +125,9 @@ export function AppSidebar({ user, wallet_balance }: { user: IUser; wallet_balan
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className='cursor-pointer'>Account</DropdownMenuItem>
-						<DropdownMenuItem className='cursor-pointer'>Wallet</DropdownMenuItem>
+						<DropdownMenuItem className='cursor-pointer' onSelect={(e) => e.preventDefault()}>
+							<AddMoney>Add to Wallet</AddMoney>
+						</DropdownMenuItem>
 						<DropdownMenuItem disabled>API</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
