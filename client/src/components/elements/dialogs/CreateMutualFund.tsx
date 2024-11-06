@@ -1,4 +1,3 @@
-'use client';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -9,124 +8,157 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-
 import { useToast } from '@/hooks/use-toast';
+import usePromise from '@/hooks/usePromise';
 import FundService from '@/services/fund.service';
+import { mutualFundSchema } from '@/validators/fund.validator';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ReloadIcon } from '@radix-ui/react-icons';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 export default function CreateMutualFund() {
 	const { toast } = useToast();
-	const [name, setName] = useState('');
-	const [initialTarget, setInitialTarget] = useState<number | ''>('');
-	const [tokenCount, setTokenCount] = useState<number | ''>('');
-	const [expenseRatio, setExpenseRatio] = useState<number | ''>('');
-	const [exitLoad, setExitLoad] = useState<number | ''>('');
-	const [exitLoadLimit, setExitLoadLimit] = useState<number | ''>('');
 
-	async function handleSave() {
-		if (!name || !initialTarget || !tokenCount || !expenseRatio || !exitLoad || !exitLoadLimit) {
-			toast({
-				title: 'Please fill in all fields',
-				variant: 'destructive',
-			});
-			return;
-		}
+	const form = useForm({
+		resolver: zodResolver(mutualFundSchema),
+		defaultValues: {
+			name: '',
+			initialTarget: '',
+			tokenCount: '',
+			expenseRatio: '',
+			exitLoad: '',
+			exitLoadLimit: '',
+		},
+	});
 
-		const response = await FundService.addMutualFund({
-			name,
-			initialTarget,
-			tokenCount,
-			expenseRatio,
-			exitLoad,
-			exitLoadLimit,
-		});
+	async function formSubmit(values: z.infer<typeof mutualFundSchema>) {
+		const response = await FundService.addMutualFund(values);
 
 		if (response) {
 			toast({
 				title: 'Mutual fund added successfully',
+				description: 'The mutual fund has been added to your account.',
+				variant: 'success',
 			});
-			clearForm();
+			form.reset();
 		} else {
 			toast({
 				title: 'Failed to add mutual fund',
+				description: 'An error occurred while adding the mutual fund.',
 				variant: 'destructive',
 			});
 		}
 	}
-
-	const clearForm = () => {
-		setName('');
-		setInitialTarget('');
-		setTokenCount('');
-		setExpenseRatio('');
-		setExitLoad('');
-		setExitLoadLimit('');
-	};
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button variant='default'>Create Mutual Fund</Button>
 			</DialogTrigger>
-			<DialogContent className='w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px]'>
+			<DialogContent className='sm:max-w-[600px]'>
 				<DialogHeader>
 					<DialogTitle>Create Mutual Fund</DialogTitle>
 				</DialogHeader>
 				<div className='py-4 space-y-4'>
-					<Input
-						placeholder='Fund Name (e.g., Growth Fund)'
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-					/>
-					<Input
-						type='number'
-						placeholder='Initial Target (e.g., 1000000.00)'
-						value={initialTarget}
-						onChange={(e) => setInitialTarget(parseFloat(e.target.value))}
-					/>
-					<Input
-						type='number'
-						placeholder='Token Count (e.g., 1000)'
-						value={tokenCount}
-						onChange={(e) => setTokenCount(parseInt(e.target.value))}
-					/>
-					<Input
-						type='number'
-						placeholder='Expense Ratio (e.g., 0.75)'
-						value={expenseRatio}
-						onChange={(e) => setExpenseRatio(parseFloat(e.target.value))}
-					/>
-					<Input
-						type='number'
-						placeholder='Exit Load (e.g., 1.5)'
-						value={exitLoad}
-						onChange={(e) => setExitLoad(parseFloat(e.target.value))}
-					/>
-					<Input
-						type='number'
-						placeholder='Exit Load Limit (days, e.g., 365)'
-						value={exitLoadLimit}
-						onChange={(e) => setExitLoadLimit(parseInt(e.target.value))}
-					/>
+					<Form {...form}>
+						<form className='space-y-2' onSubmit={form.handleSubmit(formSubmit)}>
+							<FormField
+								control={form.control}
+								name='name'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Fund Name</FormLabel>
+										<FormControl>
+											<Input placeholder='Growth Fund' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='initialTarget'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Initial Target</FormLabel>
+										<FormControl>
+											<Input type='number' placeholder='1000000.00' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='tokenCount'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Token Count</FormLabel>
+										<FormControl>
+											<Input type='number' placeholder='1000' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='expenseRatio'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Expense Ratio</FormLabel>
+										<FormControl>
+											<Input type='number' placeholder='0.75' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='exitLoad'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Exit Load</FormLabel>
+										<FormControl>
+											<Input type='number' placeholder='1.5' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='exitLoadLimit'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Exit Load Limit (days)</FormLabel>
+										<FormControl>
+											<Input type='number' placeholder='365' {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<DialogFooter>
+								<DialogClose asChild>
+									<Button type='submit'>Add Mutual Fund</Button>
+								</DialogClose>
+							</DialogFooter>
+						</form>
+					</Form>
 				</div>
-				<DialogFooter>
-					<DialogClose>
-						<Button
-							onClick={handleSave}
-							disabled={
-								!name ||
-								!initialTarget ||
-								!tokenCount ||
-								!expenseRatio ||
-								!exitLoad ||
-								!exitLoadLimit
-							}
-						>
-							Add
-						</Button>
-					</DialogClose>
-				</DialogFooter>
 			</DialogContent>
 		</Dialog>
 	);
