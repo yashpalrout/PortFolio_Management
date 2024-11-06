@@ -5,6 +5,7 @@ import api from '@/lib/api';
 import { IPagination } from '@/types';
 import { IFund } from '@/types/fund';
 import { ITicker } from '@/types/Ticker';
+import { IUser } from '@/types/user';
 import { mutualFundSchema } from '@/validators/fund.validator';
 import { z } from 'zod';
 
@@ -37,6 +38,26 @@ export default class FundService {
 	static async getFunds(searchParams: { page?: string; limit?: string; search?: string }) {
 		try {
 			const { data } = await api.get(`/mutual-fund`, {
+				params: {
+					page: searchParams.page || '1',
+					size: searchParams.limit || '20',
+					name: searchParams.search,
+				},
+			});
+
+			return {
+				data: data.data as IFund[],
+				pagination: data.pagination as IPagination,
+			};
+		} catch (e: any) {
+			console.log(e);
+			return null;
+		}
+	}
+
+	static async getManagedByMe(searchParams: { page?: string; limit?: string; search?: string }) {
+		try {
+			const { data } = await api.get(`/mutual-fund/managed-by/me`, {
 				params: {
 					page: searchParams.page || '1',
 					size: searchParams.limit || '20',
@@ -128,6 +149,17 @@ export default class FundService {
 			};
 		} catch (e: any) {
 			return null;
+		}
+	}
+
+	static async getManagers(fundId: string) {
+		try {
+			const {
+				data: { data },
+			} = await api.get(`/mutual-fund/${fundId}/managers`);
+			return data as IUser[];
+		} catch (e: any) {
+			return [];
 		}
 	}
 

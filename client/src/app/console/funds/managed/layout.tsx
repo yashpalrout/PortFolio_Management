@@ -1,9 +1,9 @@
+import Loading from '@/components/elements/loading';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import LoadingPage from './loading';
 
 export const metadata: Metadata = {
-	title: 'Fund Details • Investment Portfolio',
+	title: 'Mutual Funds • Investment Portfolio',
 };
 
 export default async function Layout({
@@ -12,8 +12,8 @@ export default async function Layout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<Suspense fallback={<LoadingPage />}>
-			<div className='w-full h-full flex justify-center'>{children}</div>
+		<Suspense fallback={<Loading />}>
+			<div className='w-full'>{children}</div>
 		</Suspense>
 	);
 }

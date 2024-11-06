@@ -19,10 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/mutual-fund")
@@ -41,7 +38,7 @@ public class MutualFundController {
     private FavoriteFundService favoriteFundService;
 
     @Autowired
-    private FundTransactionService fundTrasactionService;
+    private FundTransactionService fundTransactionService;
 
     @Autowired
     private UserService userService;
@@ -109,14 +106,32 @@ public class MutualFundController {
     }
 
     @GetMapping("/managed-by/{userId}")
-    public ResponseEntity<?> managedBy(@PathVariable int userId) {
+    public ResponseEntity<?> managedBy(@AuthenticationPrincipal User reqUser, @PathVariable int userId) {
 
         User user = userService.findUserById(userId);
-
         List<MutualFund> result = mutualFundService.findByManager(user);
+
+        if (reqUser.getRole() == UserRole.INVESTOR) {
+            result = result.stream().filter(mf -> mf.getStatus() == FundStatus.LISTED).toList();
+        }
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/managed-by/me")
+    public ResponseEntity<?> managedByMe(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination) {
+        List<MutualFund> result = mutualFundService.findByManager(user);
+        result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
     }
@@ -147,7 +162,7 @@ public class MutualFundController {
 
     @GetMapping("/list-invested")
     public ResponseEntity<?> listInvested(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
-        List<MutualFund> result = fundTrasactionService.transactionHistory(user).stream().map(FundTransaction::getFund).toList();
+        List<MutualFund> result = fundTransactionService.transactionHistory(user).stream().map(FundTransaction::getFund).toList();
 
         result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
@@ -213,6 +228,20 @@ public class MutualFundController {
 
     }
 
+    @GetMapping("/{fundId}/managers")
+    public ResponseEntity<?> findByManager(@PathVariable int fundId, @AuthenticationPrincipal User user) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        List<User> managers = fundManagerService.listFundManagers(fund).stream().map(FundManager::getManager).toList();
+        List<User> list = new ArrayList<>(managers);
+
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", list);
+        return ResponseEntity.ok(map);
+
+    }
+
     @PostMapping("/{fundId}/add-to-favorite")
     public ResponseEntity<?> addToFavorite(@PathVariable int fundId, @AuthenticationPrincipal User user) {
         MutualFund fund = mutualFundService.findById(fundId);
@@ -271,7 +300,7 @@ public class MutualFundController {
 
     @GetMapping("/transaction-history")
     public ResponseEntity<?> transactionHistory(@AuthenticationPrincipal User user) {
-        List<FundTransaction> transactionHistory = fundTrasactionService.transactionHistory(user);
+        List<FundTransaction> transactionHistory = fundTransactionService.transactionHistory(user);
 
         Map<MutualFund, Integer> mfMap = new HashMap<MutualFund, Integer>();
 

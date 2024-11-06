@@ -124,7 +124,6 @@ export function AppSidebar({ user, wallet_balance }: { user: IUser; wallet_balan
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className='cursor-pointer'>Account</DropdownMenuItem>
 						<DropdownMenuItem className='cursor-pointer' onSelect={(e) => e.preventDefault()}>
 							<AddMoney>Add to Wallet</AddMoney>
 						</DropdownMenuItem>
@@ -225,11 +224,6 @@ function FundManagerSidebar() {
 										icon={<RiFundsLine />}
 										text='Managed Funds'
 										href='/console/funds/managed'
-									/>
-									<MenuButton
-										icon={<RiExchangeFundsFill />}
-										text='Create Fund'
-										href='/console/funds/create'
 									/>
 								</SidebarMenuItem>
 							</SidebarMenu>

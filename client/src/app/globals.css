@@ -71,11 +71,11 @@ body {
 		--border: 0 0% 24.9%;
 		--input: 0 0% 14.9%;
 		--ring: 0 0% 83.1%;
-		 --chart-1: 220 70% 50%;
-		 --chart-2: 340 75% 55%;
-		 --chart-3: 30 80% 55%;
-		 --chart-4: 280 65% 60%;
-		 --chart-5: 160 60% 45%;
+		--chart-1: 220 70% 50%;
+		--chart-2: 340 75% 55%;
+		--chart-3: 30 80% 55%;
+		--chart-4: 280 65% 60%;
+		--chart-5: 160 60% 45%;
 
 		--sidebar-background: 240 5.9% 10%;
 		--sidebar-foreground: 240 4.8% 95.9%;
@@ -94,6 +94,19 @@ body {
 	}
 	body {
 		@apply bg-background text-foreground;
+	}
+
+	::-webkit-scrollbar {
+		@apply w-[0.2em] h-[0.2em];
+	}
+	::-webkit-scrollbar-button {
+		@apply h-1;
+	}
+	::-webkit-scrollbar-track-piece {
+		@apply bg-muted;
+	}
+	::-webkit-scrollbar-thumb {
+		@apply bg-gray-500 rounded-full w-[0.2em] h-[0.2em];
 	}
 }
 

@@ -9,7 +9,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { useEffect, useState } from 'react';
 
 import {
@@ -21,21 +20,20 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 
+import { addToHolding } from '@/actions/fund.action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import useDebounce from '@/hooks/useDebounce'; // Import the useDebounce hook
-import FundService from '@/services/fund.service';
 import StockService from '@/services/stock.service';
 import { ITicker } from '@/types/Ticker';
+import { useRouter } from 'next/navigation';
 
 export default function AddHolding({ fund_id }: { fund_id: string }) {
-	const placeholders = ['Search for the ticker...', 'Symbol', 'Name', 'Example: AAPL'];
-
 	const { toast } = useToast();
 	const [ratio, setRatio] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [records, setRecords] = useState<ITicker[]>([]);
+	const router = useRouter();
 
 	const [selectedStocks, setSelectedStocks] = useState<{
 		[key: string]: ITicker | undefined;
@@ -46,10 +44,6 @@ export default function AddHolding({ fund_id }: { fund_id: string }) {
 			.then(setRecords)
 			.finally(() => setLoading(false));
 	}, [setLoading]);
-
-	const clearSearch = () => {
-		setRecords([]);
-	};
 
 	async function handleSave() {
 		const resolved = Object.values(selectedStocks)
@@ -62,13 +56,13 @@ export default function AddHolding({ fund_id }: { fund_id: string }) {
 			})
 			.filter((val) => val) as { tickerId: number; ratio: number }[];
 
-		const success = await FundService.addToHolding(fund_id, resolved);
+		const success = await addToHolding(fund_id, resolved);
 
 		if (success) {
 			toast({
 				title: 'Holding added successfully',
 			});
-			clearSearch();
+			router.refresh();
 		} else {
 			toast({
 				title: 'Failed to add Holding',
