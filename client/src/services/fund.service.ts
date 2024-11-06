@@ -21,6 +21,7 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
+			console.log(e)
 			return null;
 		}
 	}
