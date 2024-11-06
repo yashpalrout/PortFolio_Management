@@ -5,8 +5,35 @@ import api from '@/lib/api';
 import { IPagination } from '@/types';
 import { IFund } from '@/types/fund';
 import { ITicker } from '@/types/Ticker';
+import { mutualFundSchema } from '@/validators/fund.validator';
+import { z } from 'zod';
 
 export default class FundService {
+	static async addMutualFund(details: z.infer<typeof mutualFundSchema>) {
+		try {
+			const { data } = await api.post('/mutual-fund', {
+				name: details.name,
+				initialTarget: details.initialTarget,
+				tokenCount: details.tokenCount,
+				expenseRatio: details.expenseRatio,
+				exitLoad: details.exitLoad,
+				exitLoadLimit: details.exitLoadLimit,
+			});
+			return {
+				success: true,
+				mutualFund: data,
+				error: null,
+			};
+		} catch (err) {
+			console.error('Failed to add mutual fund:', err);
+			return {
+				success: false,
+				mutualFund: null,
+				error: 'Failed to add mutual fund...',
+			};
+		}
+	}
+
 	static async getFunds(searchParams: { page?: string; limit?: string; search?: string }) {
 		try {
 			const { data } = await api.get(`/mutual-fund`, {
@@ -22,7 +49,7 @@ export default class FundService {
 				pagination: data.pagination as IPagination,
 			};
 		} catch (e: any) {
-			console.log(e)
+			console.log(e);
 			return null;
 		}
 	}
@@ -131,7 +158,6 @@ export default class FundService {
 		}
 	}
 
-	// Add holding to the stock
 	static async addToHolding(fundId: string, holdings: { tickerId: number; ratio: number }[]) {
 		try {
 			await api.post(`/mutual-fund/${fundId}/add-fund-holding`, { holdings });

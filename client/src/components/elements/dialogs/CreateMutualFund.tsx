@@ -10,12 +10,12 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useToast } from '@/hooks/use-toast';
-import MutualFundService from '@/services/createMF.service';
+import FundService from '@/services/fund.service';
 
-export default function AddMutualFund() {
+export default function CreateMutualFund() {
 	const { toast } = useToast();
 	const [name, setName] = useState('');
 	const [initialTarget, setInitialTarget] = useState<number | ''>('');
@@ -33,7 +33,7 @@ export default function AddMutualFund() {
 			return;
 		}
 
-		const response = await MutualFundService.addMutualFund({
+		const response = await FundService.addMutualFund({
 			name,
 			initialTarget,
 			tokenCount,
@@ -67,13 +67,11 @@ export default function AddMutualFund() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant='default' className='w-32'>
-					Add Mutual Fund
-				</Button>
+				<Button variant='default'>Create Mutual Fund</Button>
 			</DialogTrigger>
 			<DialogContent className='w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px]'>
 				<DialogHeader>
-					<DialogTitle>Add Mutual Fund to the Portal</DialogTitle>
+					<DialogTitle>Create Mutual Fund</DialogTitle>
 				</DialogHeader>
 				<div className='py-4 space-y-4'>
 					<Input
@@ -114,7 +112,17 @@ export default function AddMutualFund() {
 				</div>
 				<DialogFooter>
 					<DialogClose>
-						<Button onClick={handleSave} disabled={!name || !initialTarget || !tokenCount || !expenseRatio || !exitLoad || !exitLoadLimit}>
+						<Button
+							onClick={handleSave}
+							disabled={
+								!name ||
+								!initialTarget ||
+								!tokenCount ||
+								!expenseRatio ||
+								!exitLoad ||
+								!exitLoadLimit
+							}
+						>
 							Add
 						</Button>
 					</DialogClose>
