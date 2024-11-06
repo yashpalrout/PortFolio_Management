@@ -21,8 +21,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AiOutlineStock } from 'react-icons/ai';
 import { FaUser } from 'react-icons/fa';
 import { FaUserGear, FaUserGroup } from 'react-icons/fa6';
-import { GrFavorite } from 'react-icons/gr';
-import { MdAttachMoney, MdChevronRight } from 'react-icons/md';
+import { GrFavorite, GrMoney } from 'react-icons/gr';
+import { MdChevronRight } from 'react-icons/md';
 import { RiDashboard3Line, RiExchangeFundsFill, RiFundsLine, RiStockLine } from 'react-icons/ri';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -172,6 +172,34 @@ function InvestorSidebar() {
 					</CollapsibleContent>
 				</SidebarGroup>
 			</Collapsible>
+			<Collapsible defaultOpen className='group/collapsible'>
+				<SidebarGroup>
+					<SidebarGroupLabel asChild>
+						<CollapsibleTrigger>
+							Transactions
+							<ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+						</CollapsibleTrigger>
+					</SidebarGroupLabel>
+					<CollapsibleContent>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								<SidebarMenuItem>
+									<MenuButton
+										icon={<GrMoney />}
+										text='Fund Transaction'
+										href='/console/transactions/fund'
+									/>
+									<MenuButton
+										icon={<RiStockLine />}
+										text='Wallet Transaction'
+										href='/console/transactions/wallet'
+									/>
+								</SidebarMenuItem>
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</CollapsibleContent>
+				</SidebarGroup>
+			</Collapsible>
 		</>
 	);
 }
@@ -231,6 +259,30 @@ function FundManagerSidebar() {
 					</CollapsibleContent>
 				</SidebarGroup>
 			</Collapsible>
+
+			<Collapsible defaultOpen className='group/collapsible'>
+				<SidebarGroup>
+					<SidebarGroupLabel asChild>
+						<CollapsibleTrigger>
+							Transactions
+							<ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+						</CollapsibleTrigger>
+					</SidebarGroupLabel>
+					<CollapsibleContent>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								<SidebarMenuItem>
+									<MenuButton
+										icon={<RiStockLine />}
+										text='Wallet Transaction'
+										href='/console/transactions/wallet'
+									/>
+								</SidebarMenuItem>
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</CollapsibleContent>
+				</SidebarGroup>
+			</Collapsible>
 		</>
 	);
 }
@@ -280,10 +332,34 @@ function PortalManagerSidebar() {
 							<SidebarMenu>
 								<SidebarMenuItem>
 									<MenuButton icon={<RiFundsLine />} text='All Funds' href='/console/funds/all' />
+								</SidebarMenuItem>
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</CollapsibleContent>
+				</SidebarGroup>
+			</Collapsible>
+
+			<Collapsible defaultOpen className='group/collapsible'>
+				<SidebarGroup>
+					<SidebarGroupLabel asChild>
+						<CollapsibleTrigger>
+							Transactions
+							<ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
+						</CollapsibleTrigger>
+					</SidebarGroupLabel>
+					<CollapsibleContent>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								<SidebarMenuItem>
 									<MenuButton
-										icon={<MdAttachMoney />}
-										text='Investments'
-										href='/console/investments'
+										icon={<GrMoney />}
+										text='Fund Transaction'
+										href='/console/transactions/fund'
+									/>
+									<MenuButton
+										icon={<RiStockLine />}
+										text='Wallet Transaction'
+										href='/console/transactions/wallet'
 									/>
 								</SidebarMenuItem>
 							</SidebarMenu>
@@ -291,6 +367,7 @@ function PortalManagerSidebar() {
 					</CollapsibleContent>
 				</SidebarGroup>
 			</Collapsible>
+
 			<Collapsible defaultOpen className='group/collapsible'>
 				<SidebarGroup>
 					<SidebarGroupLabel asChild>

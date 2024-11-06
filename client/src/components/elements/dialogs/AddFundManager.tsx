@@ -20,70 +20,65 @@ import {
 	TableRow,
 } from '@/components/ui/table';
 
-import { addToHolding } from '@/actions/fund.action';
+import { useUser } from '@/components/context/user-details';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import StockService from '@/services/stock.service';
-import { ITicker } from '@/types/ticker';
+import FundService from '@/services/fund.service';
+import UserService from '@/services/user.service';
+import { IUser } from '@/types/user';
 import { useRouter } from 'next/navigation';
 
-export default function AddHolding({ fund_id }: { fund_id: string }) {
+export default function AddFundManager({ fund_id }: { fund_id: string }) {
 	const { toast } = useToast();
-	const [ratio, setRatio] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [records, setRecords] = useState<ITicker[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [records, setRecords] = useState<IUser[]>([]);
 	const router = useRouter();
+	const { profile } = useUser();
 
-	const [selectedStocks, setSelectedStocks] = useState<{
-		[key: string]: ITicker | undefined;
-	}>({});
+	const [selected, setSelected] = useState<{
+		[key: string]: IUser | undefined;
+	}>({
+		[profile?.userId ?? '']: profile,
+	});
 
 	useEffect(() => {
-		StockService.allTickers()
-			.then(setRecords)
+		UserService.allUsers()
+			.then((users) => setRecords(users?.filter((user) => user.role === 'FUND_MANAGER') ?? []))
 			.finally(() => setLoading(false));
 	}, [setLoading]);
 
 	async function handleSave() {
-		const resolved = Object.values(selectedStocks)
-			.map((stock) => {
-				if (!stock) return null;
-				return {
-					tickerId: stock.tickerId,
-					ratio: Number(ratio),
-				};
-			})
-			.filter((val) => val) as { tickerId: number; ratio: number }[];
+		const resolved = Object.values(selected).map((user) => {
+			if (!user) return true;
+			return FundService.addManager(fund_id, user.userId);
+		});
 
-		const success = await addToHolding(fund_id, resolved);
+		const success = resolved.every(Boolean);
 
 		if (success) {
 			toast({
-				title: 'Holding added successfully',
+				title: 'Managers added successfully.',
+				variant: 'success',
 			});
 			router.refresh();
 		} else {
 			toast({
-				title: 'Failed to add Holding',
+				title: 'Failed to add managers.',
 				variant: 'destructive',
 			});
 		}
 
-		setSelectedStocks({});
-		setRatio(0);
+		setSelected({});
 	}
 
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant='default' className='w-28'>
-					Add Holding
-				</Button>
+				<Button variant='default'>Add Fund Manager</Button>
 			</DialogTrigger>
 			<DialogContent className='w-full sm:max-w-[600px] md:max-w-[700px] lg:max-w-[800px]'>
 				<DialogHeader>
-					<DialogTitle>Add Funds to the Portal</DialogTitle>
+					<DialogTitle>Add Manager to the Fund</DialogTitle>
 				</DialogHeader>
 
 				{/* Conditionally render the table after search is submitted */}
@@ -95,31 +90,33 @@ export default function AddHolding({ fund_id }: { fund_id: string }) {
 								<TableRow>
 									<TableHead>Select</TableHead>
 									<TableHead>Name</TableHead>
-									<TableHead>Symbol</TableHead>
+									<TableHead>Email</TableHead>
+									<TableHead>Phone</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{records.map((stock, index) => (
+								{records.map((user, index) => (
 									<TableRow key={index}>
 										<TableCell>
 											<Checkbox
-												checked={!!selectedStocks[stock.symbol]}
+												checked={!!selected[user.userId]}
 												onCheckedChange={(checked) => {
-													setSelectedStocks((prev) => ({
+													setSelected((prev) => ({
 														...prev,
-														[stock.symbol]: checked ? stock : undefined,
+														[user.userId]: checked ? user : undefined,
 													}));
 												}}
 											/>
 										</TableCell>
-										<TableCell>{stock.name}</TableCell>
-										<TableCell>{stock.symbol}</TableCell>
+										<TableCell>{user.name}</TableCell>
+										<TableCell>{user.email}</TableCell>
+										<TableCell>{user.phone}</TableCell>
 									</TableRow>
 								))}
 
 								{records.length === 0 && (
 									<TableRow>
-										<TableCell colSpan={3} className='text-center'>
+										<TableCell colSpan={4} className='text-center'>
 											No records found
 										</TableCell>
 									</TableRow>
@@ -129,17 +126,10 @@ export default function AddHolding({ fund_id }: { fund_id: string }) {
 					</div>
 				</div>
 
-				{Object.values(selectedStocks).filter((v) => v).length > 0 && (
+				{Object.values(selected).filter((v) => v).length > 0 && (
 					<DialogFooter>
-						<Input
-							placeholder='Ratio eg 30'
-							value={ratio}
-							onChange={(e) => setRatio(Number(e.target.value))}
-						/>
 						<DialogClose>
-							<Button disabled={!ratio} onClick={handleSave}>
-								Add
-							</Button>
+							<Button onClick={handleSave}>Add</Button>
 						</DialogClose>
 					</DialogFooter>
 				)}

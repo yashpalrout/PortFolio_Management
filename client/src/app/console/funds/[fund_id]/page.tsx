@@ -5,6 +5,7 @@ import {
 	Table,
 	TableBody,
 	TableCell,
+	TableCellLink,
 	TableFooter,
 	TableHead,
 	TableHeader,
@@ -35,8 +36,8 @@ export default async function Page({
 	const total_holdings = details.holdings?.reduce((acc, curr) => acc + curr.ratio, 0) ?? 0;
 
 	return (
-		<div className='flex flex-col md:flex-row justify-between h-screen w-full md:w-[90%] gap-4'>
-			<div className='flex-1 overflow-y-scroll'>
+		<div className='flex flex-col lg:flex-row justify-between lg:h-[calc(100vh-50px)] w-full gap-4'>
+			<div className='flex-1 lg:overflow-y-scroll'>
 				<div className='flex justify-between items-center'>
 					<div className='font-bold text-2xl'>{details.fund.name}</div>
 					<div className='flex gap-3 justify-between items-center'>
@@ -75,7 +76,12 @@ export default async function Page({
 								<TableBody>
 									{details.holdings.map((row, index) => (
 										<TableRow key={index}>
-											<TableCell className='font-medium'>{row.ticker.name}</TableCell>
+											<TableCellLink
+												href={`/console/tickers/${row.ticker.tickerId}`}
+												className='font-medium'
+											>
+												{row.ticker.name}
+											</TableCellLink>
 											<TableCell>{row.ticker.sector}</TableCell>
 											<TableCell className='text-right'>{row.ratio}%</TableCell>
 										</TableRow>

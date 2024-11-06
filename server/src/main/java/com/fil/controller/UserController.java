@@ -41,7 +41,7 @@ public class UserController {
             throw new InvalidFieldException();
         }
 
-        walletService.addBalance(user, amount);
+        walletService.addBalance(user, amount, "Added to Wallet");
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
@@ -126,7 +126,7 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<?> allUsers(@AuthenticationPrincipal User user)
             throws AlreadyExistsException, PermissionDeniedException {
-        if (user.getRole() != UserRole.PORTAL_MANAGER) {
+        if (user.getRole() == UserRole.INVESTOR) {
             throw new PermissionDeniedException();
         }
         Map<String, Object> response = new HashMap<>();

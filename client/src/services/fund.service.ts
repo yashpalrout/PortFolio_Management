@@ -4,7 +4,7 @@
 import api from '@/lib/api';
 import { IPagination } from '@/types';
 import { IFund } from '@/types/fund';
-import { ITicker } from '@/types/Ticker';
+import { ITicker } from '@/types/ticker';
 import { IUser } from '@/types/user';
 import { mutualFundSchema } from '@/validators/fund.validator';
 import { z } from 'zod';
@@ -193,6 +193,24 @@ export default class FundService {
 	static async addToHolding(fundId: string, holdings: { tickerId: number; ratio: number }[]) {
 		try {
 			await api.post(`/mutual-fund/${fundId}/add-fund-holding`, { holdings });
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async addManager(fundId: string, userId: number) {
+		try {
+			await api.post(`/mutual-fund/${fundId}/add-manager/${userId}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async updateStatus(fundId: string, status: 'NOT_LISTED' | 'IPO' | 'LISTED') {
+		try {
+			await api.post(`/mutual-fund/${fundId}/status`, { status });
 			return true;
 		} catch (err) {
 			return false;

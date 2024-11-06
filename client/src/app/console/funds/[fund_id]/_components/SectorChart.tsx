@@ -20,7 +20,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { getRandomColor } from '@/lib/utils';
-import { ITicker } from '@/types/Ticker';
+import { ITicker } from '@/types/ticker';
 
 export const description = 'Sector wise asset allocation';
 

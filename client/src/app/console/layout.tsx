@@ -31,9 +31,13 @@ export default async function Layout({
 				<UserProvider data={userDetails!}>
 					<SidebarProvider>
 						<AppSidebar user={userDetails} wallet_balance={wallet_balance} />
-						<div className='w-full'>
-							<SidebarTrigger />
-							{children}
+						<div className='w-full relative'>
+							<div className='absolute left-4 top-4'>
+								<SidebarTrigger />
+							</div>
+							<div className='mt-6 w-full h-full flex justify-center'>
+								<div className='w-[90%]'>{children}</div>
+							</div>
 						</div>
 					</SidebarProvider>
 				</UserProvider>

@@ -11,6 +11,7 @@ import com.fil.service.MutualFundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mutual-fund/{fundId}/transaction")
-public class FundTranasctionController {
+public class FundTransactionController {
 
     @Autowired
     private MutualFundService mutualFundService;
@@ -29,16 +30,18 @@ public class FundTranasctionController {
     private FundTransactionService fundTransactionService;
 
     @PostMapping("/purchase")
-    public ResponseEntity<?> purchaseFund(@PathVariable int fundId, @RequestBody ModelMap modal,
-            HttpServletRequest req) {
+    public ResponseEntity<?> purchaseFund(@AuthenticationPrincipal User user, @PathVariable int fundId, @RequestBody ModelMap modal,
+                                          HttpServletRequest req) {
 
-        Object qtyObj = modal.get("qty");
-        if (!(qtyObj instanceof Integer)) {
+        int qty = 0;
+        try {
+            qty = Integer.parseInt(modal.get("qty").toString());
+        } catch (Exception ignored) {
+        }
+
+        if (qty <= 0) {
             throw new InvalidFieldException();
         }
-        User user = (User) req.getAttribute("user");
-
-        int qty = (int) qtyObj;
 
         MutualFund fund = mutualFundService.findById(fundId);
 
@@ -47,6 +50,11 @@ public class FundTranasctionController {
         }
 
         FundTransaction transaction = fundTransactionService.purchase(fund, user, qty);
+        fund.addAssetSize(transaction.getAmount());
+        if (fund.getStatus() == FundStatus.LISTED) {
+            fund.addAssetNav(transaction.getAmount());
+        }
+        mutualFundService.save(fund);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
@@ -55,15 +63,17 @@ public class FundTranasctionController {
     }
 
     @PostMapping("/sell")
-    public ResponseEntity<?> sellFund(@PathVariable int fundId, @RequestBody ModelMap modal, HttpServletRequest req) {
+    public ResponseEntity<?> sellFund(@AuthenticationPrincipal User user, @PathVariable int fundId, @RequestBody ModelMap modal, HttpServletRequest req) {
 
-        Object qtyObj = modal.get("qty");
-        if (!(qtyObj instanceof Integer)) {
+        int qty = 0;
+        try {
+            qty = Integer.parseInt(modal.get("qty").toString());
+        } catch (Exception ignored) {
+        }
+
+        if (qty <= 0) {
             throw new InvalidFieldException();
         }
-        User user = (User) req.getAttribute("user");
-
-        int qty = (int) qtyObj;
 
         MutualFund fund = mutualFundService.findById(fundId);
 
@@ -72,6 +82,10 @@ public class FundTranasctionController {
         }
 
         FundTransaction transaction = fundTransactionService.sell(fund, user, qty);
+        fund.reduceAssetSize(transaction.getAmount());
+        fund.reduceAssetNav(transaction.getAmount());
+
+        mutualFundService.save(fund);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);

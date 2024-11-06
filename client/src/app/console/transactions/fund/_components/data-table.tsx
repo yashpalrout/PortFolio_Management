@@ -19,12 +19,11 @@ import {
 	Table,
 	TableBody,
 	TableCell,
-	TableCellLink,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table';
-import { IFund } from '@/types/fund';
+import { IFundTransaction } from '@/types/transaction';
 import {
 	CaretSortIcon,
 	ChevronDownIcon,
@@ -44,156 +43,135 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
-const KEYS = [
-	'name',
-	'initialTarget',
-	'assetSize',
-	'assetNav',
-	'tokenCount',
-	'tokenPrice',
-	'expenseRatio',
-	'exitLoad',
-	'exitLoadLimit',
-	'inHand',
-	'createdAt',
-];
+const KEYS = ['fund_id', 'fund_name', 'transactionType', 'balanceAtTime', 'amount', 'reason'];
 
-function generateColumns(): ColumnDef<IFund>[] {
+type FundTransaction = {
+	fundTransactionId: number;
+	type: string;
+	quantity: number;
+	price: number;
+	amount: number;
+	createdAt: string;
+	fund_id: number;
+	fund_name: string;
+};
+
+function generateColumns(): ColumnDef<FundTransaction>[] {
 	return [
 		{
-			accessorKey: 'name',
+			accessorKey: 'type',
 			header: ({ column }) => {
 				return (
 					<Button
 						variant='ghost'
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Name
+						Type
 						<CaretSortIcon className='ml-2 h-4 w-4' />
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('name')}</div>,
+			cell: ({ row }) => <div className='px-4 uppercase'>{row.getValue('type')}</div>,
 		},
 		{
-			accessorKey: 'initialTarget',
+			accessorKey: 'fund_name',
+			header: 'Fund',
+			cell: ({ row }) => (
+				<div>
+					<Link href={`/console/funds/${row.original.fund_id}`}>{row.getValue('fund_name')}</Link>
+				</div>
+			),
+		},
+		{
+			accessorKey: 'quantity',
 			header: ({ column }) => {
 				return (
 					<Button
 						variant='ghost'
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Initial Target
+						Quantity
 						<CaretSortIcon className='ml-2 h-4 w-4' />
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('initialTarget')}</div>,
+			cell: ({ row }) => <div className='px-4'>{row.getValue('quantity')}</div>,
 		},
 		{
-			accessorKey: 'assetSize',
-			header: () => {
-				return <Button variant='ghost'>Asset Size</Button>;
-			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('assetSize')}</div>,
-		},
-		{
-			accessorKey: 'assetNav',
+			accessorKey: 'price',
 			header: ({ column }) => {
 				return (
 					<Button
 						variant='ghost'
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Asset Nav
+						Price
 						<CaretSortIcon className='ml-2 h-4 w-4' />
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('assetNav')}</div>,
+			cell: ({ row }) => <div className='px-4'>${row.getValue('price')}</div>,
 		},
 		{
-			accessorKey: 'tokenCount',
-			header: () => {
-				return <Button variant='ghost'>Token Count</Button>;
-			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('tokenCount')}</div>,
-		},
-		{
-			accessorKey: 'tokenPrice',
+			accessorKey: 'amount',
 			header: ({ column }) => {
 				return (
 					<Button
 						variant='ghost'
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Token Price
+						Amount
 						<CaretSortIcon className='ml-2 h-4 w-4' />
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>${row.getValue('tokenPrice')}</div>,
+			cell: ({ row }) => <div className='px-4'>${row.getValue('amount')}</div>,
 		},
 		{
-			accessorKey: 'expenseRatio',
+			accessorKey: 'createdAt',
 			header: ({ column }) => {
 				return (
 					<Button
 						variant='ghost'
 						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
 					>
-						Expense Ratio
+						Transaction Time
 						<CaretSortIcon className='ml-2 h-4 w-4' />
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('expenseRatio')}</div>,
-		},
-		{
-			accessorKey: 'exitLoad',
-			header: ({ column }) => {
-				return (
-					<Button
-						variant='ghost'
-						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-					>
-						Exit Load
-						<CaretSortIcon className='ml-2 h-4 w-4' />
-					</Button>
-				);
-			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('exitLoad')}</div>,
-		},
-		{
-			accessorKey: 'inHand',
-			header: ({ column }) => {
-				return (
-					<Button
-						variant='ghost'
-						onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-					>
-						In Hand
-						<CaretSortIcon className='ml-2 h-4 w-4' />
-					</Button>
-				);
-			},
-			cell: ({ row }) => <div className='px-4'>${row.getValue('inHand')}</div>,
+			cell: ({ row }) => (
+				<div className='px-4'>{new Date(row.getValue('createdAt')).toLocaleString()}</div>
+			),
 		},
 	];
 }
 
 export function DataTable({
 	title,
-	records,
+	records: dataRecords,
 	maxRecord,
 }: {
 	title: string;
-	records: IFund[];
+	records: IFundTransaction[];
 	maxRecord: number;
 }) {
+	const records = React.useMemo(() => {
+		return dataRecords.map((record) => {
+			return {
+				...record,
+				fund_name: record.fund.name,
+				fund_id: record.fund.fundId,
+			};
+		});
+	}, [dataRecords]);
+
+	console.log(records);
+
 	const hidden = (KEYS ?? []).reduce((acc, key) => {
 		acc[key] = true;
 		return acc;
@@ -203,10 +181,6 @@ export function DataTable({
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
 		...hidden,
-		exitLoadLimit: false,
-		exitLoad: false,
-		expenseRatio: false,
-		inHand: false,
 	});
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -233,7 +207,7 @@ export function DataTable({
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		onColumnVisibilityChange: setColumnVisibility,
-		getRowId: (row) => row.fundId.toString(),
+		getRowId: (row) => row.fundTransactionId.toString(),
 		state: {
 			sorting,
 			columnFilters,
@@ -376,13 +350,12 @@ export function DataTable({
 						<TableBody>
 							{table.getRowModel().rows?.length ? (
 								table.getRowModel().rows.map((row) => {
-									const link = `/console/funds/${row.original.fundId}`;
 									return (
 										<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 											{row.getVisibleCells().map((cell) => (
-												<TableCellLink href={link} key={cell.id} className='p-2'>
+												<TableCell key={cell.id} className='p-2'>
 													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-												</TableCellLink>
+												</TableCell>
 											))}
 										</TableRow>
 									);

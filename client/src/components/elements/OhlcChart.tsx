@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'; // This is a client component 👈🏽
-import { OHLC } from '@/types/Ticker';
+import { OHLC } from '@/types/ticker';
 import { useEffect, useRef } from 'react';
 
 const OhlcChart = ({ title, data }: { title: string; data: OHLC[] }) => {

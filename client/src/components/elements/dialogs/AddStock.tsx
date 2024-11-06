@@ -26,7 +26,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import useDebounce from '@/hooks/useDebounce'; // Import the useDebounce hook
 import StockService from '@/services/stock.service';
-import { ITicker } from '@/types/Ticker';
+import { ITicker } from '@/types/ticker';
 
 export default function AddStock() {
 	const placeholders = ['Search for the ticker...', 'Symbol', 'Name', 'Example: AAPL'];

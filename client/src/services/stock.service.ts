@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import api from '@/lib/api';
-import { ITicker, OHLC } from '@/types/Ticker';
+import { ITicker, OHLC } from '@/types/ticker';
 
 export default class StockService {
 	static async search(searchTerm: string) {
