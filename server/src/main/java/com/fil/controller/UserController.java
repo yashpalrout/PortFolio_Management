@@ -19,7 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +32,14 @@ public class UserController {
     private WalletService walletService;
 
     @PostMapping("/add-balance")
-    public ResponseEntity<?> addBalance(@RequestBody ModelMap modal, HttpServletRequest req) {
-        Object amtObj = modal.get("amount");
-        if (!(amtObj instanceof Double)) {
+    public ResponseEntity<?> addBalance(@AuthenticationPrincipal User user, @RequestBody ModelMap modal) {
+
+        double amount;
+        try {
+            amount = Double.parseDouble(modal.get("amount").toString());
+        } catch (Exception e) {
             throw new InvalidFieldException();
         }
-        User user = (User) req.getAttribute("user");
-
-        double amount = (double) amtObj;
 
         walletService.addBalance(user, amount);
 
