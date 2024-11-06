@@ -3,6 +3,7 @@ package com.fil.controller;
 import com.fil.dto.AddToInventory;
 import com.fil.exceptions.InvalidFieldException;
 import com.fil.market.StockMarket;
+import com.fil.model.OHLC;
 import com.fil.model.Ticker;
 import com.fil.service.TickerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,30 @@ public class StockController {
         map.put("success", true);
         map.put("data", ticker);
         return ResponseEntity.status(HttpStatus.CREATED).body(map);
+
+    }
+
+    @GetMapping("/tickers")
+    public ResponseEntity<?> addToInventory() {
+        List<Ticker> tickers = tickerService.findAll();
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", tickers);
+        return ResponseEntity.ok(map);
+
+    }
+
+    @GetMapping("/tickers/{tickerId}/ohlc")
+    public ResponseEntity<?> getOhlc(@PathVariable int tickerId) {
+        Ticker ticker = tickerService.findById(tickerId);
+
+        Map<String, OHLC> dailyOHLC = marketAPI.getDailyOHLC(ticker.getSymbol());
+
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", dailyOHLC.values());
+        return ResponseEntity.ok(map);
 
     }
 

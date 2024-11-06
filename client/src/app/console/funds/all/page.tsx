@@ -1,6 +1,6 @@
 import FundService from '@/services/fund.service';
 import { notFound } from 'next/navigation';
-import { DataTable } from './_components/data-table';
+import { DataTable } from '../_components/data-table';
 
 export default async function Page({
 	searchParams,
@@ -19,7 +19,7 @@ export default async function Page({
 
 	return (
 		<>
-			<DataTable records={data.data} maxRecord={data.pagination.total} />
+			<DataTable title={'Mutual Funds'} records={data.data} maxRecord={data.pagination.total} />
 		</>
 	);
 }

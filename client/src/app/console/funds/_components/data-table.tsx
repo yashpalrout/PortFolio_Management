@@ -187,7 +187,15 @@ function generateColumns(): ColumnDef<IFund>[] {
 	];
 }
 
-export function DataTable({ records, maxRecord }: { records: IFund[]; maxRecord: number }) {
+export function DataTable({
+	title,
+	records,
+	maxRecord,
+}: {
+	title: string;
+	records: IFund[];
+	maxRecord: number;
+}) {
 	const hidden = (KEYS ?? []).reduce((acc, key) => {
 		acc[key] = true;
 		return acc;
@@ -244,7 +252,7 @@ export function DataTable({ records, maxRecord }: { records: IFund[]; maxRecord:
 	return (
 		<div className='flex flex-col gap-4 justify-center px-4 py-4'>
 			<div className='justify-between flex'>
-				<h2 className='text-2xl font-bold'>Mutual Funds</h2>
+				<h2 className='text-2xl font-bold'>{title}</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '></div>
 			</div>
 
@@ -366,7 +374,7 @@ export function DataTable({ records, maxRecord }: { records: IFund[]; maxRecord:
 						<TableBody>
 							{table.getRowModel().rows?.length ? (
 								table.getRowModel().rows.map((row) => {
-									const link = `/console/funds/${row.getValue('id')}`;
+									const link = `/console/funds/${row.original.fundId}`;
 									return (
 										<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 											{row.getVisibleCells().map((cell) => (
