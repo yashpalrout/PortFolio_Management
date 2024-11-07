@@ -241,8 +241,8 @@ export const Card = ({
 				<BlurImage
 					src={card.src}
 					alt={card.title}
-					height={400} // Adjusted height for bigger card size
-					width={500} // Adjusted width for bigger card size
+					height={600} // Adjusted height for bigger card size
+					width={700} // Adjusted width for bigger card size
 					className='object-cover absolute z-10 inset-0'
 				/>
 			</motion.button>

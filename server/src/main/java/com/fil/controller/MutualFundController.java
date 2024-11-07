@@ -42,6 +42,9 @@ public class MutualFundController {
     private FundTransactionService fundTransactionService;
 
     @Autowired
+    private FundPriceService fundPriceService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -258,9 +261,16 @@ public class MutualFundController {
         MutualFund fund = mutualFundService.findById(fundId);
 
         List<FundHolding> holdings = fundHoldingService.findByMutualFund(fund);
+
+
+        Map<String, Double> fundValuations = new HashMap<>();
+        fundPriceService.findByFund(fund).parallelStream().forEach(val -> fundValuations.put(val.getDate().toString(), val.getPrice()));
+
+
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("fund", fund);
         data.put("holdings", holdings);
+        data.put("fundValuations", fundValuations);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);

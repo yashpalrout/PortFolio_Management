@@ -13,3 +13,7 @@ export type IFund = {
 	status: string;
 	createdAt: Date;
 };
+
+export type IFundValuation = {
+	[date: string]: number;
+};
