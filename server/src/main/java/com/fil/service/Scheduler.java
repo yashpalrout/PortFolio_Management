@@ -4,4 +4,6 @@ public interface Scheduler {
 
     public void calculateFundNewNav();
 
+    public void calculateUserNewValuation();
+
 }

@@ -22,4 +22,10 @@ public interface MutualFundService {
 
     void initiateFund(MutualFund mf);
 
+    double userNav(User user);
+
+    List<MutualFund> top5Funds(User user);
+
+    List<MutualFund> top5Funds();
+
 }
