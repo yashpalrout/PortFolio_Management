@@ -1,136 +1,63 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React from "react";
+import Link from "next/link";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 
-const MouseEnterContext = createContext<
-	[boolean, React.Dispatch<React.SetStateAction<boolean>>] | undefined
->(undefined);
+export default async function Home() {
+	const isAuthenticated = await AuthService.isAuthenticated();
 
-export const CardContainer = ({
-	children,
-	className,
-	containerClassName,
-}: {
-	children?: React.ReactNode;
-	className?: string;
-	containerClassName?: string;
-}) => {
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [isMouseEntered, setIsMouseEntered] = useState(false);
-
-	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (!containerRef.current) return;
-		const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-		const x = (e.clientX - left - width / 2) / 25;
-		const y = (e.clientY - top - height / 2) / 25;
-		containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
-	};
-
-	const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-		setIsMouseEntered(true);
-		if (!containerRef.current) return;
-	};
-
-	const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (!containerRef.current) return;
-		setIsMouseEntered(false);
-		containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
-	};
 	return (
-		<MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>
-			<div
-				className={cn('py-2 flex items-center justify-center', containerClassName)}
-				style={{
-					perspective: '1000px',
-				}}
-			>
-				<div
-					ref={containerRef}
-					onMouseEnter={handleMouseEnter}
-					onMouseMove={handleMouseMove}
-					onMouseLeave={handleMouseLeave}
-					className={cn(
-						'flex items-center justify-center relative transition-all duration-200 ease-linear w-full h-full',
-						className
+		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+				<div className="flex gap-4 items-center flex-col sm:flex-row">
+					{!isAuthenticated ? (
+						<AuthDialog />
+					) : (
+						<Link href="/console/dashboard">
+							<span>Continue to Dashboard</span>
+						</Link>
 					)}
-					style={{
-						transformStyle: 'preserve-3d',
-					}}
-				>
-					{children}
 				</div>
-			</div>
-		</MouseEnterContext.Provider>
-	);
-};
 
-export const CardBody = ({
-	children,
-	className,
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) => {
-	return (
-		<div
-			className={cn(
-				'h-full w-full [transform-style:preserve-3d]  [&>*]:[transform-style:preserve-3d]',
-				className
-			)}
-		>
-			{children}
+				<section className="w-full max-w-md">
+					<Accordion type="single" collapsible>
+						<AccordionItem value="item-1">
+							<AccordionTrigger>Why Invest With Us?</AccordionTrigger>
+							<AccordionContent>
+								<p>
+									We offer a wide range of carefully selected mutual funds and investment portfolios to help you achieve
+									your financial goals.
+								</p>
+							</AccordionContent>
+						</AccordionItem>
+						<AccordionItem value="item-2">
+							<AccordionTrigger>Our Services</AccordionTrigger>
+							<AccordionContent>
+								<p>
+									Our platform provides personalized investment options, real-time market insights, and secure asset
+									management.
+								</p>
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
+				</section>
+
+				<section className="w-full max-w-md mt-8">
+					<HoverCard>
+						<HoverCardTrigger>
+							<span className="underline cursor-pointer">What Sets Us Apart?</span>
+						</HoverCardTrigger>
+						<HoverCardContent>
+							<p>
+								Our portal is designed with both experienced investors and newcomers in mind, combining robust analytics
+								with an easy-to-use interface.
+							</p>
+						</HoverCardContent>
+					</HoverCard>
+				</section>
+			</main>
 		</div>
 	);
-};
-
-export const CardItem = ({
-	as: Tag = 'div',
-	children,
-	className,
-	translateX = 0,
-	translateY = 0,
-	translateZ = 0,
-	rotateX = 0,
-	rotateY = 0,
-	rotateZ = 0,
-	...rest
-}: {
-	as?: React.ElementType;
-	children: React.ReactNode;
-	className?: string;
-	translateX?: number | string;
-	translateY?: number | string;
-	translateZ?: number | string;
-	rotateX?: number | string;
-	rotateY?: number | string;
-	rotateZ?: number | string;
-	[key: string]: any;
-}) => {
-	const ref = useRef<HTMLDivElement>(null);
-	const [isMouseEntered] = useMouseEnter();
-
-	useEffect(() => {
-		if (!ref.current) return;
-		if (isMouseEntered) {
-			ref.current.style.transform = `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;
-		} else {
-			ref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
-		}
-	}, [isMouseEntered, rotateX, rotateY, rotateZ, translateX, translateY, translateZ]);
-
-	return (
-		<Tag ref={ref} className={cn('w-fit transition duration-200 ease-linear', className)} {...rest}>
-			{children}
-		</Tag>
-	);
-};
-
-// Create a hook to use the context
-export const useMouseEnter = () => {
-	const context = useContext(MouseEnterContext);
-	if (context === undefined) {
-		throw new Error('useMouseEnter must be used within a MouseEnterProvider');
-	}
-	return context;
-};
+}

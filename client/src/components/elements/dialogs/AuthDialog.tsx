@@ -15,7 +15,7 @@ export function AuthDialog() {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant='outline'>Login</Button>
+				<Button variant='outline' className="bounce">Login</Button>
 			</DialogTrigger>
 			<DialogContent className='sm:max-w-[450px]'>
 				<DialogHeader>

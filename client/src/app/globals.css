@@ -124,3 +124,17 @@ body {
 	width: 100%;
 	height: 100%;
 }
+
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px); /* Adjust the value for higher/lower bounce */
+    }
+}
+
+.bounce {
+    animation: bounce 3s ease-in-out infinite; /* Adjust duration and easing for the effect */
+}
