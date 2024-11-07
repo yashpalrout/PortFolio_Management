@@ -14,4 +14,9 @@ public class OHLC {
     private double open, high, low, close;
     private BigInteger volume;
 
+
+    public double calculateProfit() {
+        return (close - open) / open;
+    }
+
 }
