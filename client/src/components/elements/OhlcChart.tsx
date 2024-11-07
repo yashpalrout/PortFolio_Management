@@ -31,7 +31,7 @@ const OhlcChart = ({ title, data }: { title: string; data: OHLC[] }) => {
 			// initiate the chart drawing
 			chart.draw();
 		});
-	}, []);
+	}, [data, title]);
 
 	return (
 		<>

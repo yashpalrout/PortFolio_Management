@@ -28,19 +28,20 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			{/* Load the AnyChart libraries using next/script */}
-			<Script
-				src='https://cdn.anychart.com/releases/8.11.1/js/anychart-core.min.js'
-				strategy='beforeInteractive'
-			/>
-			<Script
-				src='https://cdn.anychart.com/releases/8.11.1/js/anychart-stock.min.js'
-				strategy='beforeInteractive'
-			/>
-			<Script
-				src='https://cdn.anychart.com/releases/8.11.1/js/anychart-data-adapter.min.js'
-				strategy='beforeInteractive'
-			/>
-
+			<head>
+				<Script
+					src='https://cdn.anychart.com/releases/8.11.1/js/anychart-core.min.js'
+					strategy='beforeInteractive'
+				/>
+				<Script
+					src='https://cdn.anychart.com/releases/8.11.1/js/anychart-stock.min.js'
+					strategy='beforeInteractive'
+				/>
+				<Script
+					src='https://cdn.anychart.com/releases/8.11.1/js/anychart-data-adapter.min.js'
+					strategy='beforeInteractive'
+				/>
+			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
 					{children}

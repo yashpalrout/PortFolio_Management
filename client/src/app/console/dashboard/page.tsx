@@ -9,5 +9,9 @@ export default async function Page() {
 	if (details.role === 'INVESTOR') {
 		return <UserDashboard details={overviewData as IUserOverview} />;
 	}
-	return <>{JSON.stringify(overviewData)}</>;
+	return (
+		<div className='text-lg font-medium text-center mt-12'>
+			PAGE UNDER DEVELOPMENT PLEASE CONTACT ATUL ✌️✌️✌️
+		</div>
+	);
 }
