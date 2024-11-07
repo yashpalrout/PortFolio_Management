@@ -4,7 +4,8 @@
 import api from '@/lib/api';
 import { IPagination } from '@/types';
 import { IFund } from '@/types/fund';
-import { ITicker } from '@/types/Ticker';
+import { ITicker } from '@/types/ticker';
+import { IUser } from '@/types/user';
 import { mutualFundSchema } from '@/validators/fund.validator';
 import { z } from 'zod';
 
@@ -37,6 +38,26 @@ export default class FundService {
 	static async getFunds(searchParams: { page?: string; limit?: string; search?: string }) {
 		try {
 			const { data } = await api.get(`/mutual-fund`, {
+				params: {
+					page: searchParams.page || '1',
+					size: searchParams.limit || '20',
+					name: searchParams.search,
+				},
+			});
+
+			return {
+				data: data.data as IFund[],
+				pagination: data.pagination as IPagination,
+			};
+		} catch (e: any) {
+			console.log(e);
+			return null;
+		}
+	}
+
+	static async getManagedByMe(searchParams: { page?: string; limit?: string; search?: string }) {
+		try {
+			const { data } = await api.get(`/mutual-fund/managed-by/me`, {
 				params: {
 					page: searchParams.page || '1',
 					size: searchParams.limit || '20',
@@ -131,6 +152,17 @@ export default class FundService {
 		}
 	}
 
+	static async getManagers(fundId: string) {
+		try {
+			const {
+				data: { data },
+			} = await api.get(`/mutual-fund/${fundId}/managers`);
+			return data as IUser[];
+		} catch (e: any) {
+			return [];
+		}
+	}
+
 	static async addToFavorite(fundId: string) {
 		try {
 			await api.post(`/mutual-fund/${fundId}/add-to-favorite`);
@@ -161,6 +193,24 @@ export default class FundService {
 	static async addToHolding(fundId: string, holdings: { tickerId: number; ratio: number }[]) {
 		try {
 			await api.post(`/mutual-fund/${fundId}/add-fund-holding`, { holdings });
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async addManager(fundId: string, userId: number) {
+		try {
+			await api.post(`/mutual-fund/${fundId}/add-manager/${userId}`);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	static async updateStatus(fundId: string, status: 'NOT_LISTED' | 'IPO' | 'LISTED') {
+		try {
+			await api.post(`/mutual-fund/${fundId}/status`, { status });
 			return true;
 		} catch (err) {
 			return false;

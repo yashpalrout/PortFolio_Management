@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
 	Dialog,
@@ -18,11 +19,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import usePromise from '@/hooks/usePromise';
 import FundService from '@/services/fund.service';
 import { mutualFundSchema } from '@/validators/fund.validator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -33,11 +32,11 @@ export default function CreateMutualFund() {
 		resolver: zodResolver(mutualFundSchema),
 		defaultValues: {
 			name: '',
-			initialTarget: '',
-			tokenCount: '',
-			expenseRatio: '',
-			exitLoad: '',
-			exitLoadLimit: '',
+			initialTarget: 0,
+			tokenCount: 0,
+			expenseRatio: 0,
+			exitLoad: 0,
+			exitLoadLimit: 0,
 		},
 	});
 

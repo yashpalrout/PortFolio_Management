@@ -72,4 +72,19 @@ public class MutualFund {
         this.status = FundStatus.NOT_LISTED;
     }
 
+    public void addAssetSize(double amount) {
+        this.assetSize += amount;
+    }
+
+    public void addAssetNav(double amount) {
+        this.assetNav += amount;
+    }
+
+    public void reduceAssetSize(double amount) {
+        this.assetSize -= amount;
+    }
+    
+    public void reduceAssetNav(double amount) {
+        this.assetNav -= amount;
+    }
 }

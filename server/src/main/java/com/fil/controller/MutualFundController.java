@@ -6,6 +6,7 @@ import com.fil.dto.Pagination;
 import com.fil.dto.UpdateFundStatus;
 import com.fil.exceptions.InitialisationFailedException;
 import com.fil.exceptions.NotFoundException;
+import com.fil.exceptions.PermissionDeniedException;
 import com.fil.interfaces.PaginationParams;
 import com.fil.model.*;
 import com.fil.model.enums.FundStatus;
@@ -19,10 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/mutual-fund")
@@ -41,7 +39,7 @@ public class MutualFundController {
     private FavoriteFundService favoriteFundService;
 
     @Autowired
-    private FundTransactionService fundTrasactionService;
+    private FundTransactionService fundTransactionService;
 
     @Autowired
     private UserService userService;
@@ -79,44 +77,96 @@ public class MutualFundController {
 
     @PostMapping("/{fundId}/status")
     public ResponseEntity<?> updateFundStatus(@PathVariable int fundId, @Valid @RequestBody UpdateFundStatus data) {
-        MutualFund fund = mutualFundService.findById(fundId);
+        try {
+            MutualFund fund = mutualFundService.findById(fundId);
 
-        if (data.getStatus() == FundStatus.LISTED && fund.getAssetSize() < fund.getInitialTarget()) {
-            throw new InitialisationFailedException();
-        } else if (data.getStatus() == FundStatus.IPO) {
-            Optional<Double> optRatio = fundHoldingService.findByMutualFund(fund).stream().map(FundHolding::getRatio)
-                    .reduce(Double::sum);
-            if (optRatio.isEmpty() || optRatio.get() <= 0) {
+            if (data.getStatus() == FundStatus.LISTED) {
+                if (fund.getAssetSize() < fund.getInitialTarget()) {
+                    throw new InitialisationFailedException();
+                }
+            } else if (data.getStatus() == FundStatus.IPO) {
+                Optional<Double> optRatio = fundHoldingService.findByMutualFund(fund).stream().map(FundHolding::getRatio)
+                        .reduce(Double::sum);
+                if (optRatio.isEmpty() || optRatio.get() <= 0) {
+                    throw new InitialisationFailedException();
+                }
+            } else {
                 throw new InitialisationFailedException();
             }
-        } else {
-            throw new InitialisationFailedException();
+
+            fund.setStatus(data.getStatus());
+
+
+            if (data.getStatus() == FundStatus.LISTED) {
+                mutualFundService.initiateFund(fund);
+            }
+
+            mutualFundService.save(fund);
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("success", true);
+            map.put("data", fund);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        fund.setStatus(data.getStatus());
-
-        mutualFundService.save(fund);
-
-        if (data.getStatus() == FundStatus.LISTED) {
-            mutualFundService.initiateFund(fund);
-        }
-
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("success", true);
-        map.put("data", fund);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(map);
     }
 
     @GetMapping("/managed-by/{userId}")
-    public ResponseEntity<?> managedBy(@PathVariable int userId) {
+    public ResponseEntity<?> managedBy(@AuthenticationPrincipal User reqUser, @PathVariable int userId) {
 
         User user = userService.findUserById(userId);
-
         List<MutualFund> result = mutualFundService.findByManager(user);
+
+        if (reqUser.getRole() == UserRole.INVESTOR) {
+            result = result.stream().filter(mf -> mf.getStatus() == FundStatus.LISTED).toList();
+        }
+
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @PostMapping("/{fundId}/add-manager/{userId}")
+    public ResponseEntity<?> managedBy(@AuthenticationPrincipal User reqUser, @PathVariable int userId, @PathVariable int fundId) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        User newManager = userService.findUserById(userId);
+
+        List<FundManager> fundManagers = fundManagerService.listFundManagers(fund);
+
+        boolean anyMatch = fundManagers.stream().anyMatch(fm -> fm.getManager().getUserId() == reqUser.getUserId());
+
+        if (!anyMatch) {
+            throw new PermissionDeniedException();
+        }
+        boolean alreadyMatch = fundManagers.stream().anyMatch(fm -> fm.getManager().getUserId() == newManager.getUserId());
+
+        if (!alreadyMatch) {
+            fundManagerService.save(newManager, fund);
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/managed-by/me")
+    public ResponseEntity<?> managedByMe(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination) {
+        List<MutualFund> result = mutualFundService.findByManager(user);
+        int totalRecords = result.size();
+        result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
+
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", result);
+        map.put("pagination", Pagination.paginationMap(pagination, totalRecords));
+
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
     }
@@ -134,12 +184,13 @@ public class MutualFundController {
             result = result.stream().filter(mf -> mf.getStatus() == FundStatus.LISTED).toList();
         }
 
+        int totalRecords = result.size();
         result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
-        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+        map.put("pagination", Pagination.paginationMap(pagination, totalRecords));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
@@ -147,14 +198,17 @@ public class MutualFundController {
 
     @GetMapping("/list-invested")
     public ResponseEntity<?> listInvested(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
-        List<MutualFund> result = fundTrasactionService.transactionHistory(user).stream().map(FundTransaction::getFund).toList();
+        List<MutualFund> result = fundTransactionService.transactionHistory(user).stream().map(FundTransaction::getFund).toList();
 
+        result = result.stream().distinct().toList();
+
+        int totalRecords = result.size();
         result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
-        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+        map.put("pagination", Pagination.paginationMap(pagination, totalRecords));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
@@ -164,12 +218,13 @@ public class MutualFundController {
     public ResponseEntity<?> listFavourite(@AuthenticationPrincipal User user, @PaginationParams Pagination pagination, @RequestParam(name = "name", required = false) Optional<String> name) {
         List<MutualFund> result = favoriteFundService.findByUser(user).stream().map(FavoriteFund::getMutualFund).toList();
 
+        int totalRecords = result.size();
         result = result.stream().skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
-        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+        map.put("pagination", Pagination.paginationMap(pagination, totalRecords));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
 
@@ -185,13 +240,14 @@ public class MutualFundController {
             result = mutualFundService.search(name.get());
         }
 
+        int totalRecords = result.size();
         result = result.stream().filter(mf -> mf.getStatus() == FundStatus.IPO).skip(pagination.getSkip()).limit(pagination.getSize()).toList();
 
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("success", true);
         map.put("data", result);
-        map.put("pagination", Pagination.paginationMap(pagination, result.size()));
+        map.put("pagination", Pagination.paginationMap(pagination, totalRecords));
 
         return ResponseEntity.ok(map);
 
@@ -210,6 +266,20 @@ public class MutualFundController {
         map.put("success", true);
         map.put("data", data);
         return ResponseEntity.status(HttpStatus.OK).body(map);
+
+    }
+
+    @GetMapping("/{fundId}/managers")
+    public ResponseEntity<?> findByManager(@PathVariable int fundId, @AuthenticationPrincipal User user) {
+        MutualFund fund = mutualFundService.findById(fundId);
+        List<User> managers = fundManagerService.listFundManagers(fund).stream().map(FundManager::getManager).toList();
+        List<User> list = new ArrayList<>(managers);
+
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("success", true);
+        map.put("data", list);
+        return ResponseEntity.ok(map);
 
     }
 
@@ -271,7 +341,7 @@ public class MutualFundController {
 
     @GetMapping("/transaction-history")
     public ResponseEntity<?> transactionHistory(@AuthenticationPrincipal User user) {
-        List<FundTransaction> transactionHistory = fundTrasactionService.transactionHistory(user);
+        List<FundTransaction> transactionHistory = fundTransactionService.transactionHistory(user);
 
         Map<MutualFund, Integer> mfMap = new HashMap<MutualFund, Integer>();
 

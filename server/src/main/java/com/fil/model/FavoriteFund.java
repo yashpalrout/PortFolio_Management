@@ -18,12 +18,12 @@ public class FavoriteFund {
     @TableGenerator(name = "favorite_id_generator", table = "id_gen", pkColumnName = "gen_name", valueColumnName = "id_val", initialValue = 101, allocationSize = 0)
     private int favoriteId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "mutualFund", nullable = false)
     @JsonIgnore
     private MutualFund mutualFund;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "user", nullable = false)
     @JsonIgnore
     private User user;

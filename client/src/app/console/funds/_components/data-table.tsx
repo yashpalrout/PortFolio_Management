@@ -180,9 +180,7 @@ function generateColumns(): ColumnDef<IFund>[] {
 					</Button>
 				);
 			},
-			cell: ({ row }) => (
-				<div className='px-4'>{Date.parse(row.getValue('inHand')).toLocaleString()}</div>
-			),
+			cell: ({ row }) => <div className='px-4'>${row.getValue('inHand')}</div>,
 		},
 	];
 }
@@ -205,6 +203,10 @@ export function DataTable({
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
 		...hidden,
+		exitLoadLimit: false,
+		exitLoad: false,
+		expenseRatio: false,
+		inHand: false,
 	});
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -250,14 +252,14 @@ export function DataTable({
 	}
 
 	return (
-		<div className='flex flex-col gap-4 justify-center px-4 py-4'>
+		<div className='flex flex-col gap-4 justify-center pb-4'>
 			<div className='justify-between flex'>
 				<h2 className='text-2xl font-bold'>{title}</h2>
 				<div className='flex gap-x-2 gap-y-1 flex-wrap '></div>
 			</div>
 
 			<div className='w-full'>
-				<div className='flex flex-wrap items-center justify-end px-2 mt-3'>
+				<div className='flex flex-wrap items-center justify-end mt-3 mb-2'>
 					<div className='flex items-center space-x-3 lg:space-x-5'>
 						<div className='flex items-center space-x-2'>
 							<p className='text-sm font-medium'>Rows</p>

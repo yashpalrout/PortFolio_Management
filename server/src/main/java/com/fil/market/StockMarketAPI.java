@@ -1,6 +1,7 @@
 package com.fil.market;
 
 import com.fil.config.Environment;
+import com.fil.exceptions.NotFoundException;
 import com.fil.model.OHLC;
 import com.fil.model.StockData;
 import com.fil.model.Ticker;
@@ -88,7 +89,7 @@ public class StockMarketAPI implements StockMarket {
     }
 
     @Override
-    public StockData getStockData(String query) {
+    public StockData getStockData(String query) throws NotFoundException {
         try {
             String searchURL = "https://www.alphavantage.co/query?function=OVERVIEW&symbol=" + query + "&apikey="
                     + API_KEY;
@@ -102,23 +103,56 @@ public class StockMarketAPI implements StockMarket {
             return StockData.fromJson(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            throw new NotFoundException();
         }
     }
 
     @Override
-    public Map<String, OHLC> getDailyOHLC(String symbol) {
-        return getOHLC(symbol, "TIME_SERIES_DAILY", "Time Series (Daily)");
+    public String lastRefreshed(String symbol) throws NotFoundException {
+        try {
+
+            String searchURL = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol
+                    + "&apikey=" + API_KEY;
+            URL url = new URL(searchURL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            JSONObject jsonObject = getResponseObject(connection);
+
+            JSONObject timeSeries = jsonObject.getJSONObject("Meta Data");
+
+            return timeSeries.getString("3. Last Refreshed");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NotFoundException();
+        }
     }
 
     @Override
-    public Map<String, OHLC> getWeeklyOHLC(String symbol) {
-        return getOHLC(symbol, "TIME_SERIES_WEEKLY", "Weekly Time Series");
+    public Map<String, OHLC> getDailyOHLC(String symbol) throws NotFoundException {
+        Map<String, OHLC> ohlcMap = getOHLC(symbol, "TIME_SERIES_DAILY", "Time Series (Daily)");
+        if (ohlcMap == null) {
+            throw new NotFoundException();
+        }
+        return ohlcMap;
     }
 
     @Override
-    public Map<String, OHLC> getMonthlyOHLC(String symbol) {
-        return getOHLC(symbol, "TIME_SERIES_MONTHLY", "Monthly Time Series");
+    public Map<String, OHLC> getWeeklyOHLC(String symbol) throws NotFoundException {
+        Map<String, OHLC> ohlcMap = getOHLC(symbol, "TIME_SERIES_WEEKLY", "Weekly Time Series");
+        if (ohlcMap == null) {
+            throw new NotFoundException();
+        }
+        return ohlcMap;
+    }
+
+    @Override
+    public Map<String, OHLC> getMonthlyOHLC(String symbol) throws NotFoundException {
+        Map<String, OHLC> ohlcMap = getOHLC(symbol, "TIME_SERIES_MONTHLY", "Monthly Time Series");
+        if (ohlcMap == null) {
+            throw new NotFoundException();
+        }
+        return ohlcMap;
     }
 
     public Map<String, OHLC> getOHLC(String symbol, String timeFunction, String timeSeriesKey) {
