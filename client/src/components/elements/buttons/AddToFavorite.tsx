@@ -10,7 +10,7 @@ export default function AddToFavorite({ fundId }: { fundId: string }) {
 		FundService.isFavorite(fundId).then((isFavorite) => {
 			setIsFavorite(isFavorite);
 		});
-	}, []);
+	}, [fundId]);
 
 	function toggleFavorite() {
 		const promise = isFavorite

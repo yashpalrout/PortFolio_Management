@@ -10,7 +10,7 @@ export default class StockService {
 					search: searchTerm,
 				},
 			});
-			return data.data as ITicker[];
+			return (data.data ?? []) as ITicker[];
 		} catch (err) {
 			return [];
 		}
@@ -37,7 +37,7 @@ export default class StockService {
 	static async getOhlcData(ticker_id: string) {
 		try {
 			const { data } = await api.get(`/stock/tickers/${ticker_id}/ohlc`);
-			return data.data as OHLC[];
+			return (data.data ?? []) as OHLC[];
 		} catch (err) {
 			return [];
 		}

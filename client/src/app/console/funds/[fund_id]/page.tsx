@@ -15,6 +15,7 @@ import { SERVER_URL } from '@/lib/consts';
 import FundService from '@/services/fund.service';
 import { notFound } from 'next/navigation';
 import ActionPanel from './_components/ActionPanel';
+import { FundPriceChart } from './_components/FundPriceChart';
 import SectorChart from './_components/SectorChart';
 
 export default async function Page({
@@ -44,6 +45,10 @@ export default async function Page({
 						<AddToFavorite fundId={fund_id} />
 						<Share link={`${SERVER_URL}/console/funds/${fund_id}`} />
 					</div>
+				</div>
+
+				<div className='my-3'>
+					<FundPriceChart data={details.fundValuations} />
 				</div>
 
 				<Separator />

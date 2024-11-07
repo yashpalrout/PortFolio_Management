@@ -3,7 +3,7 @@
 
 import api from '@/lib/api';
 import { IPagination } from '@/types';
-import { IFund } from '@/types/fund';
+import { IFund, IFundValuation } from '@/types/fund';
 import { ITicker } from '@/types/ticker';
 import { IUser } from '@/types/user';
 import { mutualFundSchema } from '@/validators/fund.validator';
@@ -139,6 +139,7 @@ export default class FundService {
 			} = await api.get(`/mutual-fund/${fundId}`);
 			return {
 				fund: data.fund as IFund,
+				fundValuations: data.fundValuations as IFundValuation,
 				holdings: data.holdings as {
 					ticker: ITicker;
 					ratio: number;
