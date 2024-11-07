@@ -137,7 +137,6 @@ export default async function Page({
 					<Separator orientation='vertical' className='h-24 w-[1px]' />
 					<div className='flex-1'>
 						<AssetCard title='Initial target:' value={'$' + details.fund.initialTarget} />
-						<AssetCard title='Token Count:' value={details.fund.tokenCount.toString()} />
 					</div>
 				</div>
 			</div>

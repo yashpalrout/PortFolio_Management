@@ -45,4 +45,9 @@ public class FundHolding {
         this.nav = 0;
     }
 
+    public void addProfit(double profitPercentage) {
+        double profit = this.nav * profitPercentage;
+        this.nav += profit;
+    }
+
 }
