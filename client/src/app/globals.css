@@ -138,3 +138,6 @@ body {
 .bounce {
     animation: bounce 3s ease-in-out infinite; /* Adjust duration and easing for the effect */
 }
+.anychart-credits {
+	display: none;
+}

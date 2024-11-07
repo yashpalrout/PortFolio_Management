@@ -52,6 +52,7 @@ public class FundTransactionController {
         FundTransaction transaction = fundTransactionService.purchase(fund, user, qty);
         fund.addAssetSize(transaction.getAmount());
         if (fund.getStatus() == FundStatus.LISTED) {
+            fund.addAssetSize(transaction.getAmount());
             fund.addAssetNav(transaction.getAmount());
         }
         mutualFundService.save(fund);

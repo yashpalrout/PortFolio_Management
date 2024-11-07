@@ -15,6 +15,8 @@ public interface FundTransactionRepo extends JpaRepository<FundTransaction, Inte
 
     List<FundTransaction> findByFundAndUser(MutualFund fund, User user);
 
+    List<FundTransaction> findByUser(User user);
+
     List<FundTransaction> findByUserOrderByCreatedAtDesc(User user);
 
 }
