@@ -10,6 +10,8 @@ public interface MutualFundService {
 
     MutualFund save(MutualFund mf);
 
+    void saveAll(List<MutualFund> list);
+
     List<MutualFund> findByManager(User user);
 
     List<MutualFund> search(String name);

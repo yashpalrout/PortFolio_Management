@@ -8,14 +8,27 @@ import com.fil.service.FundHoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class FundHoldingServiceImpl implements FundHoldingService {
 
     @Autowired
     FundHoldingRepo fundHoldingRepo;
+
+    @Override
+    public List<FundHolding> findAll() {
+        return fundHoldingRepo.findAll();
+    }
+
+    @Override
+    public List<FundHolding> findAllListed() {
+
+        return List.of();
+    }
 
     @Override
     public void saveAll(List<FundHolding> holdings) {

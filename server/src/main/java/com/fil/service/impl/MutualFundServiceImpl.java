@@ -1,9 +1,13 @@
 package com.fil.service.impl;
 
+import com.fil.dto.OHLC;
 import com.fil.exceptions.InitialisationFailedException;
 import com.fil.exceptions.NotFoundException;
 import com.fil.market.StockMarket;
-import com.fil.model.*;
+import com.fil.model.FundHolding;
+import com.fil.model.FundManager;
+import com.fil.model.MutualFund;
+import com.fil.model.User;
 import com.fil.repo.FundHoldingRepo;
 import com.fil.repo.FundManagerRepo;
 import com.fil.repo.MutualFundRepo;
@@ -12,11 +16,13 @@ import com.fil.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class MutualFundServiceImpl implements MutualFundService {
 
     @Autowired
@@ -35,6 +41,11 @@ public class MutualFundServiceImpl implements MutualFundService {
     public MutualFund save(MutualFund mf) {
         mutualFundRepo.save(mf);
         return mf;
+    }
+
+    @Override
+    public void saveAll(List<MutualFund> list) {
+        mutualFundRepo.saveAll(list);
     }
 
     @Override

@@ -52,7 +52,6 @@ const KEYS = [
 	'initialTarget',
 	'assetSize',
 	'assetNav',
-	'tokenCount',
 	'tokenPrice',
 	'expenseRatio',
 	'exitLoad',
@@ -91,14 +90,14 @@ function generateColumns(): ColumnDef<IFund>[] {
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('initialTarget')}</div>,
+			cell: ({ row }) => <div className='px-4'>${row.getValue('initialTarget')}</div>,
 		},
 		{
 			accessorKey: 'assetSize',
 			header: () => {
 				return <Button variant='ghost'>Asset Size</Button>;
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('assetSize')}</div>,
+			cell: ({ row }) => <div className='px-4'>${row.getValue('assetSize')}</div>,
 		},
 		{
 			accessorKey: 'assetNav',
@@ -113,14 +112,7 @@ function generateColumns(): ColumnDef<IFund>[] {
 					</Button>
 				);
 			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('assetNav')}</div>,
-		},
-		{
-			accessorKey: 'tokenCount',
-			header: () => {
-				return <Button variant='ghost'>Token Count</Button>;
-			},
-			cell: ({ row }) => <div className='px-4'>{row.getValue('tokenCount')}</div>,
+			cell: ({ row }) => <div className='px-4'>${row.getValue('assetNav')}</div>,
 		},
 		{
 			accessorKey: 'tokenPrice',
