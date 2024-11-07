@@ -23,7 +23,7 @@ public class ResponseUtil {
     public static ResponseCookie createAuthCookie(String type, String value, int duration) {
         return ResponseCookie.from(type, value)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .maxAge(duration)
                 .path("/").build();
     }

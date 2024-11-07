@@ -101,7 +101,7 @@ body {
 	}
 
 	::-webkit-scrollbar {
-		@apply w-[0.2em] h-[0.2em];
+		@apply w-[0.2em] h-[0.2em] hidden;
 	}
 	::-webkit-scrollbar-button {
 		@apply h-1;
@@ -125,18 +125,18 @@ body {
 	height: 100%;
 }
 
-
 @keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px); /* Adjust the value for higher/lower bounce */
-    }
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px); /* Adjust the value for higher/lower bounce */
+	}
 }
 
 .bounce {
-    animation: bounce 3s ease-in-out infinite; /* Adjust duration and easing for the effect */
+	animation: bounce 3s ease-in-out infinite; /* Adjust duration and easing for the effect */
 }
 .anychart-credits {
 	display: none;

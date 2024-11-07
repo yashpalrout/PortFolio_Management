@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
 		if (isAuthenticated) {
 			const callback = request.nextUrl.searchParams.get('callback');
 			return Response.redirect(
-				new URL(callback || `${roleBasedPath}/console/dashboard/dashboard`, request.url)
+				new URL(callback || `${roleBasedPath}/console/dashboard`, request.url)
 			);
 		} else {
 			return;
