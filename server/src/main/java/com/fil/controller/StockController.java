@@ -1,9 +1,9 @@
 package com.fil.controller;
 
 import com.fil.dto.AddToInventory;
+import com.fil.dto.OHLC;
 import com.fil.exceptions.InvalidFieldException;
 import com.fil.market.StockMarket;
-import com.fil.model.OHLC;
 import com.fil.model.Ticker;
 import com.fil.service.TickerService;
 import org.springframework.beans.factory.annotation.Autowired;

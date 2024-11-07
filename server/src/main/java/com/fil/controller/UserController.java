@@ -3,14 +3,15 @@ package com.fil.controller;
 import com.fil.dto.PasswordChangeData;
 import com.fil.dto.UserRegistrationData;
 import com.fil.dto.UserUpdateData;
-import com.fil.exceptions.AlreadyExistsException;
 import com.fil.exceptions.InvalidFieldException;
 import com.fil.exceptions.NotFoundException;
 import com.fil.exceptions.PermissionDeniedException;
 import com.fil.model.User;
 import com.fil.model.Wallet;
 import com.fil.model.enums.UserRole;
+import com.fil.service.MutualFundService;
 import com.fil.service.UserService;
+import com.fil.service.UserValuationService;
 import com.fil.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,15 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
     @Autowired
     private WalletService walletService;
+
+    @Autowired
+    private MutualFundService fundService;
+
+    @Autowired
+    private UserValuationService userValuationService;
 
     @PostMapping("/add-balance")
     public ResponseEntity<?> addBalance(@AuthenticationPrincipal User user, @RequestBody ModelMap modal) {
@@ -106,7 +114,7 @@ public class UserController {
 
     @PostMapping("/add-user")
     public ResponseEntity<?> addUser(@Valid @RequestBody UserRegistrationData data, @AuthenticationPrincipal User authUser)
-            throws AlreadyExistsException, PermissionDeniedException {
+            throws PermissionDeniedException {
         if (authUser.getRole() != UserRole.PORTAL_MANAGER) {
             throw new PermissionDeniedException();
         }
@@ -125,13 +133,34 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<?> allUsers(@AuthenticationPrincipal User user)
-            throws AlreadyExistsException, PermissionDeniedException {
+            throws PermissionDeniedException {
         if (user.getRole() == UserRole.INVESTOR) {
             throw new PermissionDeniedException();
         }
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("data", userService.listAllUsers());
+        return ResponseEntity.ok(response);
+
+    }
+
+
+    @GetMapping("/overview")
+    public ResponseEntity<?> overview(@AuthenticationPrincipal User user) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        if (user.getRole() == UserRole.INVESTOR) {
+            Map<String, Double> userValuations = new HashMap<>();
+            userValuationService.findByUser(user).parallelStream().forEach(val -> userValuations.put(val.getDate().toString(), val.getPrice()));
+
+
+            response.put("nav", fundService.userNav(user));
+            response.put("userValuations", userValuations);
+            response.put("top5Funds", fundService.top5Funds(user));
+        }
+
+
+        response.put("popularFunds", fundService.top5Funds());
         return ResponseEntity.ok(response);
 
     }

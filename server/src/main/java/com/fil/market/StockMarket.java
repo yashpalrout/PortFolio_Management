@@ -1,7 +1,7 @@
 package com.fil.market;
 
+import com.fil.dto.OHLC;
 import com.fil.exceptions.NotFoundException;
-import com.fil.model.OHLC;
 import com.fil.model.StockData;
 import com.fil.model.Ticker;
 

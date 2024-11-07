@@ -22,8 +22,4 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(userAuthInterceptor).addPathPatterns("/api/**").excludePathPatterns("/api/auth/login", "/api/auth/register");
-//    }
 }

@@ -1,13 +1,17 @@
 package com.fil.service;
 
-import java.util.List;
-
 import com.fil.model.FundHolding;
 import com.fil.model.MutualFund;
 
+import java.util.List;
+
 public interface FundHoldingService {
 
-	void saveAll(List<FundHolding> mf);
+    List<FundHolding> findAll();
 
-	List<FundHolding> findByMutualFund(MutualFund fund);
+    List<FundHolding> findAllListed();
+
+    void saveAll(List<FundHolding> mf);
+
+    List<FundHolding> findByMutualFund(MutualFund fund);
 }

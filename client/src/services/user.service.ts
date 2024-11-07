@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import api from '@/lib/api';
+import { IUserOverview } from '@/types/overview';
 import { IUser } from '@/types/user';
 import { passwordSchema, registerSchema, userDetailsSchema } from '@/validators/auth.validator';
 import axios from 'axios';
@@ -94,6 +95,15 @@ export default class UserService {
 		try {
 			const { data } = await api.get(`/user/all`);
 			return data.data as IUser[];
+		} catch (err) {
+			return null;
+		}
+	}
+
+	static async overview() {
+		try {
+			const { data } = await api.get(`/user/overview`);
+			return data as IUserOverview;
 		} catch (err) {
 			return null;
 		}

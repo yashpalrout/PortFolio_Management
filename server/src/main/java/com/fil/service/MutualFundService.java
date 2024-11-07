@@ -10,6 +10,8 @@ public interface MutualFundService {
 
     MutualFund save(MutualFund mf);
 
+    void saveAll(List<MutualFund> list);
+
     List<MutualFund> findByManager(User user);
 
     List<MutualFund> search(String name);
@@ -19,5 +21,11 @@ public interface MutualFundService {
     MutualFund findById(int mfId) throws NotFoundException;
 
     void initiateFund(MutualFund mf);
+
+    double userNav(User user);
+
+    List<MutualFund> top5Funds(User user);
+
+    List<MutualFund> top5Funds();
 
 }
