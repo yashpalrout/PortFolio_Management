@@ -21,7 +21,13 @@ import { z } from 'zod';
 
 type RegisterRole = z.infer<typeof registerSchema>['role'];
 
-export default function Register() {
+export default function Register({
+	preventDefault,
+	onSubmit,
+}: {
+	preventDefault?: boolean;
+	onSubmit?: (values: z.infer<typeof registerSchema>) => void;
+}) {
 	const { loading, run } = usePromise();
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -39,6 +45,12 @@ export default function Register() {
 	});
 
 	async function formSubmit(values: z.infer<typeof registerSchema>) {
+		if (preventDefault) {
+			if (onSubmit) {
+				onSubmit(values);
+			}
+			return;
+		}
 		const result = await run(AuthService.register(values));
 
 		if (result.authenticated) {
