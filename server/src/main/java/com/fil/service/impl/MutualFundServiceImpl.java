@@ -5,11 +5,13 @@ import com.fil.exceptions.InitialisationFailedException;
 import com.fil.exceptions.NotFoundException;
 import com.fil.market.StockMarket;
 import com.fil.model.*;
+import com.fil.model.enums.FundStatus;
 import com.fil.model.enums.TransactionType;
 import com.fil.repo.FundHoldingRepo;
 import com.fil.repo.FundManagerRepo;
 import com.fil.repo.FundTransactionRepo;
 import com.fil.repo.MutualFundRepo;
+import com.fil.service.FundPriceService;
 import com.fil.service.MutualFundService;
 import com.fil.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class MutualFundServiceImpl implements MutualFundService {
     FundTransactionRepo fundTransactionRepo;
 
     @Autowired
+    FundPriceService fundPriceService;
+
+    @Autowired
     StockMarket stockMarket;
 
     @Override
@@ -52,7 +57,7 @@ public class MutualFundServiceImpl implements MutualFundService {
     @Override
     public List<MutualFund> findByManager(User user) {
         List<FundManager> byManager = fundManagerRepo.findByManager(user);
-        return byManager.stream().map(fm -> fm.getMutualFund()).toList();
+        return byManager.stream().map(FundManager::getMutualFund).toList();
     }
 
     @Override
@@ -67,7 +72,7 @@ public class MutualFundServiceImpl implements MutualFundService {
 
     @Override
     public MutualFund findById(int mfId) throws NotFoundException {
-        return mutualFundRepo.findById(mfId).orElseThrow(() -> new NotFoundException());
+        return mutualFundRepo.findById(mfId).orElseThrow(NotFoundException::new);
     }
 
     @Override
@@ -144,5 +149,88 @@ public class MutualFundServiceImpl implements MutualFundService {
         mutualFunds.sort((m1, m2) -> (int) (m2.getAssetSize() - m1.getAssetSize()));
         return mutualFunds.stream().limit(5).toList();
 
+    }
+
+    @Override
+    public double calculateTotalAsset(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+
+        return mutualFunds.stream().map(MutualFund::getAssetSize).reduce(Double::sum).orElse(0.0);
+    }
+
+    @Override
+    public double calculateTotalNav(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+
+        return mutualFunds.stream().map(MutualFund::getAssetNav).reduce(Double::sum).orElse(0.0);
+    }
+
+    @Override
+    public long totalListed(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+
+        return mutualFunds.stream().filter(mf -> mf.getStatus() == FundStatus.LISTED).count();
+    }
+
+    @Override
+    public long totalNonListed(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+
+        return mutualFunds.stream().filter(mf -> mf.getStatus() == FundStatus.NOT_LISTED).count();
+    }
+
+    @Override
+    public long totalIPO(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+
+        return mutualFunds.stream().filter(mf -> mf.getStatus() == FundStatus.IPO).count();
+    }
+
+    @Override
+    public List<Map<String, Double>> top5Performing(User user) {
+        List<MutualFund> mutualFunds;
+        if (user == null) {
+            mutualFunds = mutualFundRepo.findAll();
+        } else {
+            mutualFunds = findByManager(user);
+        }
+        mutualFunds = new ArrayList<>(mutualFunds.stream().filter(fund -> fund.getStatus() == FundStatus.LISTED).toList());
+        mutualFunds.sort((m1, m2) -> (int) (m2.getAssetSize() - m1.getAssetSize()));
+        mutualFunds = mutualFunds.stream().limit(5).toList();
+
+        List<Map<String, Double>> result = new ArrayList<>();
+
+        mutualFunds.parallelStream().forEach(fund -> {
+            Map<String, Double> fundValuations = new HashMap<>();
+            fundPriceService.findByFund(fund).parallelStream().forEach(val -> fundValuations.put(val.getDate().toString(), val.getPrice()));
+            result.add(fundValuations);
+        });
+
+        return result;
     }
 }

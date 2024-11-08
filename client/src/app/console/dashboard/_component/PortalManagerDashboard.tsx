@@ -1,7 +1,11 @@
-import { IFundManagerOverview } from '@/types/overview';
+import { IPortalManagerOverview } from '@/types/overview';
 import { FundComparison } from './FundComparison';
 
-export default async function FundManagerDashboard({ details }: { details: IFundManagerOverview }) {
+export default async function PortalManagerDashboard({
+	details,
+}: {
+	details: IPortalManagerOverview;
+}) {
 	// const wallet_balance = await UserService.walletBalance();
 	return (
 		<div className='flex flex-col gap-3'>
@@ -15,11 +19,17 @@ export default async function FundManagerDashboard({ details }: { details: IFund
 					<CountCard title={'No. of IPO'} value={details.ipo} />
 					<CountCard title={'No. of Non Listed'} value={details.nonListed} />
 				</div>
+				<div className='flex flex-row gap-6'>
+					<CountCard title={'No. of Investors'} value={details.users} />
+					<CountCard title={'Valuable Investors'} value={details.usersInvested} />
+				</div>
 			</div>
 
 			{details.top5Comparison && details.top5Comparison.length > 0 && (
 				<FundComparison details={details.top5Comparison} />
 			)}
+
+			{/* <UserValuationChart data={details.userValuations} /> */}
 		</div>
 	);
 }

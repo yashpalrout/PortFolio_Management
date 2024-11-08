@@ -73,4 +73,9 @@ public class FundTransactionServiceImpl implements FundTransactionService {
         return transactionRepo.findByUserOrderByCreatedAtDesc(user);
     }
 
+    @Override
+    public long investedUsersCount() {
+        return transactionRepo.findAll().parallelStream().map(FundTransaction::getUser).distinct().count();
+    }
+
 }
