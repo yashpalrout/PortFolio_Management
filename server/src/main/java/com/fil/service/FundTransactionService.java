@@ -14,7 +14,9 @@ public interface FundTransactionService {
     FundTransaction sell(MutualFund fund, User user, int qty) throws TransactionNotAllowdedException;
 
     List<FundTransaction> transactionHistory();
-	
+
     List<FundTransaction> transactionHistory(User user);
+
+    long investedUsersCount();
 
 }

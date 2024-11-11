@@ -9,10 +9,7 @@ import com.fil.exceptions.PermissionDeniedException;
 import com.fil.model.User;
 import com.fil.model.Wallet;
 import com.fil.model.enums.UserRole;
-import com.fil.service.MutualFundService;
-import com.fil.service.UserService;
-import com.fil.service.UserValuationService;
-import com.fil.service.WalletService;
+import com.fil.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +32,8 @@ public class UserController {
 
     @Autowired
     private MutualFundService fundService;
+    @Autowired
+    private FundTransactionService fundTransactionService;
 
     @Autowired
     private UserValuationService userValuationService;
@@ -157,10 +156,35 @@ public class UserController {
             response.put("nav", fundService.userNav(user));
             response.put("userValuations", userValuations);
             response.put("top5Funds", fundService.top5Funds(user));
+        } else if (user.getRole() == UserRole.FUND_MANAGER) {
+            response.put("totalAsset", fundService.calculateTotalAsset(user));
+            response.put("totalNav", fundService.calculateTotalNav(user));
+            response.put("listed", fundService.totalListed(user));
+            response.put("nonListed", fundService.totalNonListed(user));
+            response.put("ipo", fundService.totalIPO(user));
+            response.put("top5Comparison", fundService.top5Performing(user));
+        } else {
+            System.out.println("STAGE 1");
+            response.put("totalAsset", fundService.calculateTotalAsset(null));
+            System.out.println("STAGE 2");
+            response.put("totalNav", fundService.calculateTotalNav(null));
+            System.out.println("STAGE 3");
+            response.put("listed", fundService.totalListed(null));
+            System.out.println("STAGE 4");
+            response.put("nonListed", fundService.totalNonListed(null));
+            System.out.println("STAGE 5");
+            response.put("ipo", fundService.totalIPO(null));
+            response.put("top5Comparison", fundService.top5Performing(null));
+            System.out.println("STAGE 7");
+            response.put("users", userService.listAllUsers().size());
+            System.out.println("STAGE 8");
+            response.put("usersInvested", fundTransactionService.investedUsersCount());
+            System.out.println("STAGE 9");
+
+
         }
 
 
-        response.put("popularFunds", fundService.top5Funds());
         return ResponseEntity.ok(response);
 
     }
